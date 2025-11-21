@@ -6,7 +6,7 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.yandex.practicum.model.hub.enums.HubEventType;
 
-@Getter @Setter @ToString
+@Getter @Setter @ToString(callSuper = true)
 public class DeviceRemovedEvent extends HubEvent {
     @NotBlank
     private String id;
