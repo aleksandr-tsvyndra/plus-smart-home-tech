@@ -20,8 +20,8 @@ protocol HubEventProtocol {
 
     enum ConditionOperationAvro {
         EQUALS,
-        GREATER THAN,
-        LOWER THAN
+        GREATER_THAN,
+        LOWER_THAN
     }
 
     enum ActionTypeAvro {
@@ -64,7 +64,7 @@ protocol HubEventProtocol {
     }
 
     record HubEventAvro {
-        string hub_id;
+        string hubId;
         timestamp_ms timestamp;
         union {
             DeviceAddedEventAvro,
