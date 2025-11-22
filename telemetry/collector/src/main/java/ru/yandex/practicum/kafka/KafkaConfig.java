@@ -21,8 +21,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaProducer<String, SpecificRecordBase> kafkaProducer(Properties properties) {
+    public KafkaProducer<String, SpecificRecordBase> kafkaProducer() {
         log.info("Создаём бин KafkaProducer с подготовленной ранее конфигурацией...");
-        return new KafkaProducer<>(properties);
+        return new KafkaProducer<>(kafkaProducerProperties());
     }
 }
