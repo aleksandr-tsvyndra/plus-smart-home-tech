@@ -30,8 +30,7 @@ public class KafkaEventProducer implements AutoCloseable, DisposableBean {
             String topic;
             if (value instanceof SensorEventAvro) {
                 topic = sensorsTopic;
-            }
-            if (value instanceof HubEventAvro) {
+            } else {
                 topic = hubsTopic;
             }
             ProducerRecord<String, SpecificRecordBase> record = new ProducerRecord<>(
