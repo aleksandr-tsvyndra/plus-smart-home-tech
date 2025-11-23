@@ -47,7 +47,7 @@ public class EventServiceImpl implements EventService {
         SensorEventAvro avro = sensorEventMappers.get(event.getType()).mapToAvro(event);
         log.info("Передаём событие от датчиков {} в Kafka-продюсер для подготовки к отправке", avro);
         producer.send(
-                new KafkaTopicNames().getSensorsTopic(),
+                "telemetry.sensors.v1",
                 avro.getTimestamp().toEpochMilli(),
                 avro.getHubId(),
                 avro
@@ -63,7 +63,7 @@ public class EventServiceImpl implements EventService {
         HubEventAvro avro = hubEventMappers.get(event.getType()).mapToAvro(event);
         log.info("Передаём событие от хабов {} в Kafka-продюсер для подготовки к отправке", avro);
         producer.send(
-                new KafkaTopicNames().getHubsTopic(),
+                "telemetry.hubs.v1",
                 avro.getTimestamp().toEpochMilli(),
                 avro.getHubId(),
                 avro
