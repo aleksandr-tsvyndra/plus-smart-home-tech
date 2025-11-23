@@ -22,7 +22,7 @@ public class KafkaConfig {
 
     @Bean
     public KafkaProducer<String, SpecificRecordBase> kafkaProducer() {
-        log.info("Создаём бин KafkaProducer с подготовленной ранее конфигурацией...");
+        log.info("Создаём бин KafkaProducer...");
         return new KafkaProducer<>(kafkaProducerProperties());
     }
 }
