@@ -2,6 +2,7 @@ package ru.yandex.practicum.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.exception.IllegalTypeEventException;
 import ru.yandex.practicum.kafka.KafkaEventProducer;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
@@ -41,7 +42,7 @@ public class EventServiceImpl implements EventService {
     public void processSensorEvent(SensorEvent event) {
         if (!sensorEventMappers.containsKey(event.getType())) {
             log.error("Не найден обработчик для типа события от датчиков: {}", event.getType());
-            throw new IllegalArgumentException("Для данного типа нет подходящего маппера");
+            throw new IllegalTypeEventException("Для данного типа события нет подходящего маппера");
         }
         SensorEventAvro avro = sensorEventMappers.get(event.getType()).mapToAvro(event);
         log.info("Передаём событие от датчиков {} в Kafka-продюсер для подготовки к отправке", avro);
@@ -56,7 +57,7 @@ public class EventServiceImpl implements EventService {
     public void processHubEvent(HubEvent event) {
         if (!hubEventMappers.containsKey(event.getType())) {
             log.error("Не найден обработчик для типа события от хабов: {}", event.getType());
-            throw new IllegalArgumentException("Для данного типа нет подходящего маппера");
+            throw new IllegalTypeEventException("Для данного типа события нет подходящего маппера");
         }
         HubEventAvro avro = hubEventMappers.get(event.getType()).mapToAvro(event);
         log.info("Передаём событие от хабов {} в Kafka-продюсер для подготовки к отправке", avro);
