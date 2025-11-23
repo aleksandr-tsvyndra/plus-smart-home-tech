@@ -3,7 +3,6 @@ package ru.yandex.practicum.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.kafka.KafkaEventProducer;
-import ru.yandex.practicum.kafka.KafkaTopicNames;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.mapper.hub.HubEventMapper;
@@ -47,7 +46,6 @@ public class EventServiceImpl implements EventService {
         SensorEventAvro avro = sensorEventMappers.get(event.getType()).mapToAvro(event);
         log.info("Передаём событие от датчиков {} в Kafka-продюсер для подготовки к отправке", avro);
         producer.send(
-                "telemetry.sensors.v1",
                 avro.getTimestamp().toEpochMilli(),
                 avro.getHubId(),
                 avro
@@ -63,7 +61,6 @@ public class EventServiceImpl implements EventService {
         HubEventAvro avro = hubEventMappers.get(event.getType()).mapToAvro(event);
         log.info("Передаём событие от хабов {} в Kafka-продюсер для подготовки к отправке", avro);
         producer.send(
-                "telemetry.hubs.v1",
                 avro.getTimestamp().toEpochMilli(),
                 avro.getHubId(),
                 avro
