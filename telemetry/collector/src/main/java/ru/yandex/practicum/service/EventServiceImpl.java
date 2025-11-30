@@ -3,15 +3,13 @@ package ru.yandex.practicum.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.exception.IllegalTypeEventException;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.KafkaEventProducer;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.mapper.hub.HubEventMapper;
 import ru.yandex.practicum.mapper.sensor.SensorEventMapper;
-import ru.yandex.practicum.model.hub.HubEvent;
-import ru.yandex.practicum.model.hub.enums.HubEventType;
-import ru.yandex.practicum.model.sensor.SensorEvent;
-import ru.yandex.practicum.model.sensor.enums.SensorEventType;
 
 import java.util.Map;
 import java.util.Set;
@@ -23,8 +21,8 @@ import java.util.stream.Collectors;
 public class EventServiceImpl implements EventService {
     private final KafkaEventProducer producer;
 
-    private final Map<SensorEventType, SensorEventMapper> sensorEventMappers;
-    private final Map<HubEventType, HubEventMapper> hubEventMappers;
+    private final Map<SensorEventProto.PayloadCase, SensorEventMapper> sensorEventMappers;
+    private final Map<HubEventProto.PayloadCase, HubEventMapper> hubEventMappers;
 
     public EventServiceImpl(
             KafkaEventProducer producer,
@@ -39,12 +37,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void processSensorEvent(SensorEvent event) {
-        if (!sensorEventMappers.containsKey(event.getType())) {
-            log.error("Не найден обработчик для типа события от датчиков: {}", event.getType());
+    public void processSensorEvent(SensorEventProto event) {
+        if (!sensorEventMappers.containsKey(event.getPayloadCase())) {
+            log.error("Не найден обработчик для типа события от датчиков: {}", event.getPayloadCase());
             throw new IllegalTypeEventException("Для данного типа события нет подходящего маппера");
         }
-        SensorEventAvro avro = sensorEventMappers.get(event.getType()).mapToAvro(event);
+        SensorEventAvro avro = sensorEventMappers.get(event.getPayloadCase()).mapToAvro(event);
         log.info("Передаём событие от датчиков {} в Kafka-продюсер для подготовки к отправке", avro);
         producer.send(
                 avro.getTimestamp().toEpochMilli(),
@@ -54,12 +52,12 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void processHubEvent(HubEvent event) {
-        if (!hubEventMappers.containsKey(event.getType())) {
-            log.error("Не найден обработчик для типа события от хабов: {}", event.getType());
+    public void processHubEvent(HubEventProto event) {
+        if (!hubEventMappers.containsKey(event.getPayloadCase())) {
+            log.error("Не найден обработчик для типа события от хабов: {}", event.getPayloadCase());
             throw new IllegalTypeEventException("Для данного типа события нет подходящего маппера");
         }
-        HubEventAvro avro = hubEventMappers.get(event.getType()).mapToAvro(event);
+        HubEventAvro avro = hubEventMappers.get(event.getPayloadCase()).mapToAvro(event);
         log.info("Передаём событие от хабов {} в Kafka-продюсер для подготовки к отправке", avro);
         producer.send(
                 avro.getTimestamp().toEpochMilli(),

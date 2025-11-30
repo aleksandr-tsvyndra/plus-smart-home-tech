@@ -2,22 +2,26 @@ package ru.yandex.practicum.mapper.sensor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import ru.yandex.practicum.model.sensor.SensorEvent;
+
+import java.time.Instant;
 
 @Slf4j
 public abstract class BaseSensorEventMapper<T extends SpecificRecordBase> implements SensorEventMapper {
 
-    protected abstract T mapToAvroPayload(SensorEvent event);
+    protected abstract T mapToAvroPayload(SensorEventProto event);
 
     @Override
-    public SensorEventAvro mapToAvro(SensorEvent event) {
+    public SensorEventAvro mapToAvro(SensorEventProto event) {
         T payload = mapToAvroPayload(event);
         log.info("Маппим событие от датчиков в объект типа {}", SensorEventAvro.class.getSimpleName());
         return SensorEventAvro.newBuilder()
                 .setId(event.getId())
                 .setHubId(event.getHubId())
-                .setTimestamp(event.getTimestamp())
+                .setTimestamp(Instant.ofEpochSecond(
+                        event.getTimestamp().getSeconds(),
+                        event.getTimestamp().getNanos()))
                 .setPayload(payload)
                 .build();
     }

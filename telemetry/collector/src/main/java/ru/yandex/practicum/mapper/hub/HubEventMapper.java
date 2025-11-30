@@ -1,13 +1,12 @@
 package ru.yandex.practicum.mapper.hub;
 
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
-import ru.yandex.practicum.model.hub.HubEvent;
-import ru.yandex.practicum.model.hub.enums.HubEventType;
 
 public interface HubEventMapper {
 
-    HubEventAvro mapToAvro(HubEvent event);
+    HubEventAvro mapToAvro(HubEventProto event);
 
-    HubEventType getHubEventType();
+    HubEventProto.PayloadCase getHubEventType();
 
 }

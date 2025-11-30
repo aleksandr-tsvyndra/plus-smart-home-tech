@@ -1,13 +1,12 @@
 package ru.yandex.practicum.mapper.sensor;
 
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
-import ru.yandex.practicum.model.sensor.SensorEvent;
-import ru.yandex.practicum.model.sensor.enums.SensorEventType;
 
 public interface SensorEventMapper {
 
-    SensorEventAvro mapToAvro(SensorEvent event);
+    SensorEventAvro mapToAvro(SensorEventProto event);
 
-    SensorEventType getSensorEventType();
+    SensorEventProto.PayloadCase getSensorEventType();
 
 }
