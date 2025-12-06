@@ -4,14 +4,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.model.Sensor;
 
-import java.util.Collection;
-import java.util.Optional;
+import java.util.List;
 
 @Repository
 public interface SensorRepository extends JpaRepository<Sensor, Long> {
 
-    boolean existsByIdInAndHubId(Collection<String> ids, String hubId);
+    boolean existsByIdAndHubId(String id, String hubId);
 
-    Optional<Sensor> findByIdAndHubId(String id, String hubId);
+    boolean existsByIdInAndHubId(List<String> ids, String hubId);
+
+    void deleteByIdAndHubId(String id, String hubId);
 
 }
