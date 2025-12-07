@@ -48,11 +48,11 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
     ) {
         List<String> conditionSensorIds = conditions.stream().map(ScenarioConditionAvro::getSensorId).toList();
         List<String> actionSensorIds = actions.stream().map(DeviceActionAvro::getSensorId).toList();
-        if (!sensorRepository.existsByIdInAndHubId(conditionSensorIds, hubId)) {
+        if (!sensorRepository.existsAllByIdInAndHubId(conditionSensorIds, hubId)) {
             throw new IllegalArgumentException("Не найдены устройства, указанные в списке условий");
         }
 
-        if (!sensorRepository.existsByIdInAndHubId(actionSensorIds, hubId)) {
+        if (!sensorRepository.existsAllByIdInAndHubId(actionSensorIds, hubId)) {
             throw new IllegalArgumentException("Не найдены устройства, указанные в списке действий");
         }
     }

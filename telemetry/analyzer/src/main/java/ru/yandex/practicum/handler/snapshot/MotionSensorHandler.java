@@ -15,7 +15,11 @@ public class MotionSensorHandler implements SensorHandler {
 
     @Override
     public Integer handleValue(SensorStateAvro stateAvro, ConditionType type) {
-        MotionSensorAvro sensorAvro = (MotionSensorAvro) stateAvro.getData();
-        return type.equals(ConditionType.MOTION) ? sensorAvro.getMotion() ? 1 : 0 : null;
+        var sensorAvro = (MotionSensorAvro) stateAvro.getData();
+        if (type.equals(ConditionType.MOTION)) {
+            return sensorAvro.getMotion() ? 1 : 0;
+        } else {
+            return null;
+        }
     }
 }

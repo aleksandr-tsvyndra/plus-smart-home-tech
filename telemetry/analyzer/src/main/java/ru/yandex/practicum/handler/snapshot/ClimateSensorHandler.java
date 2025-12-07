@@ -15,7 +15,7 @@ public class ClimateSensorHandler implements SensorHandler {
 
     @Override
     public Integer handleValue(SensorStateAvro stateAvro, ConditionType type) {
-        ClimateSensorAvro sensorAvro = (ClimateSensorAvro) stateAvro.getData();
+        var sensorAvro = (ClimateSensorAvro) stateAvro.getData();
         return switch (type) {
             case TEMPERATURE -> sensorAvro.getTemperature();
             case HUMIDITY -> sensorAvro.getHumidity();

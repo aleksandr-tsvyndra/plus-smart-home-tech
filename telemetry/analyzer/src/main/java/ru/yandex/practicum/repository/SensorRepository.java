@@ -11,7 +11,7 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
 
     boolean existsByIdAndHubId(String id, String hubId);
 
-    boolean existsByIdInAndHubId(List<String> ids, String hubId);
+    boolean existsAllByIdInAndHubId(List<String> ids, String hubId);
 
     void deleteByIdAndHubId(String id, String hubId);
 

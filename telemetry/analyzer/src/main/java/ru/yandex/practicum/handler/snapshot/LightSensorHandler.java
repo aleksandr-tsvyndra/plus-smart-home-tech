@@ -15,7 +15,7 @@ public class LightSensorHandler implements SensorHandler {
 
     @Override
     public Integer handleValue(SensorStateAvro stateAvro, ConditionType type) {
-        LightSensorAvro sensorAvro = (LightSensorAvro) stateAvro.getData();
+        var sensorAvro = (LightSensorAvro) stateAvro.getData();
         return type.equals(ConditionType.LUMINOSITY) ? sensorAvro.getLuminosity() : null;
     }
 }

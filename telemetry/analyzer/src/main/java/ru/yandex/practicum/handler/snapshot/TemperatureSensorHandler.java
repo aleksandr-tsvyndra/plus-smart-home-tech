@@ -14,7 +14,7 @@ public class TemperatureSensorHandler implements SensorHandler {
 
     @Override
     public Integer handleValue(SensorStateAvro stateAvro, ConditionType type) {
-        TemperatureSensorAvro sensorAvro = (TemperatureSensorAvro) stateAvro.getData();
+        var sensorAvro = (TemperatureSensorAvro) stateAvro.getData();
         return type.equals(ConditionType.TEMPERATURE) ? sensorAvro.getTemperatureC() : null;
     }
 }
