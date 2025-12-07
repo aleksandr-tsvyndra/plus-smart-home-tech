@@ -1,7 +1,6 @@
 package ru.yandex.practicum.client;
 
 import com.google.protobuf.Timestamp;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Service;
@@ -18,17 +17,16 @@ import java.util.Map;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class HubRouterClient {
     @GrpcClient("hub-router")
-    private final HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouterClient;
+    private HubRouterControllerGrpc.HubRouterControllerBlockingStub hubRouter;
 
     public void send(Scenario scenario) {
         Map<String, Action> actions = scenario.getActions();
         log.info("Подготавливаем и отправляем в сервис Hub Router запросы с действиями");
         actions.keySet().stream()
                 .map(sensorId -> mapToDeviceActionRequest(sensorId, actions.get(sensorId), scenario))
-                .forEach(hubRouterClient::handleDeviceAction);
+                .forEach(hubRouter::handleDeviceAction);
     }
 
     public void send(List<Scenario> scenarios) {
