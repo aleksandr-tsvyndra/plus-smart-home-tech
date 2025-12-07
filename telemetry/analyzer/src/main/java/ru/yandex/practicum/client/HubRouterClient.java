@@ -24,9 +24,10 @@ public class HubRouterClient {
     public void send(Scenario scenario) {
         Map<String, Action> actions = scenario.getActions();
         log.info("Подготавливаем и отправляем в сервис Hub Router запросы с действиями");
-        actions.keySet().stream()
-                .map(sensorId -> mapToDeviceActionRequest(sensorId, actions.get(sensorId), scenario))
-                .forEach(hubRouter::handleDeviceAction);
+        for (var sensorId : actions.keySet()) {
+            var request = mapToDeviceActionRequest(sensorId, actions.get(sensorId), scenario);
+            hubRouter.handleDeviceAction(request);
+        }
     }
 
     public void send(List<Scenario> scenarios) {
