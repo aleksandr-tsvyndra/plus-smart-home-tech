@@ -21,7 +21,7 @@ public class KafkaEventProducer implements AutoCloseable, DisposableBean {
 
     @Value(value = "${collector.kafka.producer.topics.sensors-events}")
     private String sensorsTopic;
-    @Value(value = "${collector.kafka.producer.topics.hub-events}")
+    @Value(value = "${collector.kafka.producer.topics.hubs-events}")
     private String hubsTopic;
 
     public void send(Long timestamp, String hubId, SpecificRecordBase value) {
