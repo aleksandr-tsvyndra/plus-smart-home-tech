@@ -8,6 +8,7 @@ import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 import ru.yandex.practicum.model.Condition;
 import ru.yandex.practicum.model.Scenario;
+import ru.yandex.practicum.model.enums.ConditionOperation;
 import ru.yandex.practicum.repository.ScenarioRepository;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class SnapshotService {
     }
 
     public void handle(SensorsSnapshotAvro snapshot) {
-        List<Scenario> scenarios = scenarioRepository.findByHubId(snapshot.getHubId());
+        List<Scenario> scenarios = scenarioRepository.findAllByHubId(snapshot.getHubId());
         if (scenarios.isEmpty()) {
             throw new IllegalArgumentException("У хаба с id " + snapshot.getHubId() + " нет сценариев");
         }
@@ -45,7 +46,7 @@ public class SnapshotService {
         hubRouterClient.send(toDoScenarios);
     }
 
-    private boolean validateConditions(Scenario scenario, SensorsSnapshotAvro snapshot) {
+    private Boolean validateConditions(Scenario scenario, SensorsSnapshotAvro snapshot) {
         Map<String, Condition> conditions = scenario.getConditions();
         Map<String, SensorStateAvro> sensorStates = snapshot.getSensorState();
         if (conditions.isEmpty() || sensorStates.isEmpty()) {
@@ -55,7 +56,7 @@ public class SnapshotService {
                 .allMatch(sensorId -> validateConditions(conditions.get(sensorId), sensorStates.get(sensorId)));
     }
 
-    private boolean validateConditions(Condition condition, SensorStateAvro sensorState) {
+    private Boolean validateConditions(Condition condition, SensorStateAvro sensorState) {
         if (sensorState == null) {
             return false;
         }
@@ -67,14 +68,14 @@ public class SnapshotService {
         return getConditionOperation(condition, value);
     }
 
-    private boolean getConditionOperation(Condition condition, Integer value) {
+    private Boolean getConditionOperation(Condition condition, Integer value) {
         if (value == null) {
             return false;
         }
         return switch (condition.getOperation()) {
-            case EQUALS -> value.equals(condition.getValue());
-            case GREATER_THAN -> value > condition.getValue();
-            case LOWER_THAN -> value < condition.getValue();
+            case ConditionOperation.EQUALS -> value.equals(condition.getValue());
+            case ConditionOperation.GREATER_THAN -> value > condition.getValue();
+            case ConditionOperation.LOWER_THAN -> value < condition.getValue();
         };
     }
 }
