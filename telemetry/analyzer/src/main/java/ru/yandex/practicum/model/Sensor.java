@@ -1,6 +1,7 @@
 package ru.yandex.practicum.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,8 +14,9 @@ import java.util.Set;
 @Entity
 @Builder
 @Table(name = "sensors")
+@AllArgsConstructor
+@NoArgsConstructor
 @Getter @Setter @ToString
-
 public class Sensor {
     @Id
     private String id;
