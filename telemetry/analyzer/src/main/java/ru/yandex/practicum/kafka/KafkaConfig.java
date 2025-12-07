@@ -29,13 +29,13 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaConsumer<String, HubEventAvro> kafkaHubConsumer() {
+    public KafkaConsumer<String, HubEventAvro> hubConsumer() {
         log.info("Создаём бин KafkaHubConsumer...");
         return new KafkaConsumer<>(kafkaHubConsumerProperties());
     }
 
     @Bean
-    public KafkaConsumer<String, SensorsSnapshotAvro> kafkaSnapshotConsumer() {
+    public KafkaConsumer<String, SensorsSnapshotAvro> snapshotConsumer() {
         log.info("Создаём бин KafkaSnapshotConsumer...");
         return new KafkaConsumer<>(kafkaSnapshotConsumerProperties());
     }
