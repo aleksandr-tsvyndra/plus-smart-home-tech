@@ -1,5 +1,7 @@
 package ru.yandex.practicum.mapper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceActionAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioConditionAvro;
@@ -14,9 +16,8 @@ import ru.yandex.practicum.model.enums.ConditionType;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HubEventMapper {
-
-    private HubEventMapper() {}
 
     public static Scenario mapToScenario(ScenarioAddedEventAvro avro, String hubId) {
         Scenario scenario = Scenario.builder().hubId(hubId).name(avro.getName()).build();
