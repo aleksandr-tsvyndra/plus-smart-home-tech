@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioRemovedEventAvro;
 import ru.yandex.practicum.repository.ScenarioRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -19,6 +20,7 @@ public class ScenarioRemovedEventHandler implements HubEventHandler {
     }
 
     @Override
+    @Transactional
     public void handle(HubEventAvro hubEvent) {
         var payload = (ScenarioRemovedEventAvro) hubEvent.getPayload();
         log.info("Удаляем из БД следующий сценарий: {}", payload);

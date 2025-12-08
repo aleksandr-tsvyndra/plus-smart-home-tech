@@ -7,6 +7,7 @@ import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.mapper.HubEventMapper;
 import ru.yandex.practicum.repository.SensorRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -20,6 +21,7 @@ public class DeviceAddedEventHandler implements HubEventHandler {
     }
 
     @Override
+    @Transactional
     public void handle(HubEventAvro hubEvent) {
         var payload = (DeviceAddedEventAvro) hubEvent.getPayload();
         if (sensorRepository.existsByIdAndHubId(payload.getId(), hubEvent.getHubId())) {

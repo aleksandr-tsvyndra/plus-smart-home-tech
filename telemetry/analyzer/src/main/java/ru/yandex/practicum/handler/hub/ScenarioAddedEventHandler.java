@@ -11,6 +11,7 @@ import ru.yandex.practicum.mapper.HubEventMapper;
 import ru.yandex.practicum.model.Scenario;
 import ru.yandex.practicum.repository.ScenarioRepository;
 import ru.yandex.practicum.repository.SensorRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +29,7 @@ public class ScenarioAddedEventHandler implements HubEventHandler {
     }
 
     @Override
+    @Transactional
     public void handle(HubEventAvro hubEvent) {
         var payload = (ScenarioAddedEventAvro) hubEvent.getPayload();
         checkSensors(payload.getConditions(), payload.getActions(), hubEvent.getHubId());

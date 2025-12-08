@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.repository.SensorRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
@@ -19,6 +20,7 @@ public class DeviceRemovedEventHandler implements HubEventHandler {
     }
 
     @Override
+    @Transactional
     public void handle(HubEventAvro hubEvent) {
         var payload = (DeviceRemovedEventAvro) hubEvent.getPayload();
         log.info("Удаляем из БД следующий датчик: {}", payload);
