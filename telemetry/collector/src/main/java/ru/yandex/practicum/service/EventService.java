@@ -1,12 +1,12 @@
 package ru.yandex.practicum.service;
 
-import ru.yandex.practicum.model.hub.HubEvent;
-import ru.yandex.practicum.model.sensor.SensorEvent;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 
 public interface EventService {
 
-    void processSensorEvent(SensorEvent event);
+    void processSensorEvent(SensorEventProto event);
 
-    void processHubEvent(HubEvent event);
+    void processHubEvent(HubEventProto event);
 
 }

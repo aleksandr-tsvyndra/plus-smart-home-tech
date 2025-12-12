@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.clients.producer.Producer;
-import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -22,7 +21,7 @@ public class KafkaEventProducer implements AutoCloseable, DisposableBean {
 
     @Value(value = "${collector.kafka.producer.topics.sensors-events}")
     private String sensorsTopic;
-    @Value(value = "${collector.kafka.producer.topics.hub-events}")
+    @Value(value = "${collector.kafka.producer.topics.hubs-events}")
     private String hubsTopic;
 
     public void send(Long timestamp, String hubId, SpecificRecordBase value) {

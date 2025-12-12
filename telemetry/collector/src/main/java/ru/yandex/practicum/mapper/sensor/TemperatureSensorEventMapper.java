@@ -2,30 +2,33 @@ package ru.yandex.practicum.mapper.sensor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.TemperatureSensorProto;
 import ru.yandex.practicum.kafka.telemetry.event.TemperatureSensorAvro;
-import ru.yandex.practicum.model.sensor.SensorEvent;
-import ru.yandex.practicum.model.sensor.TemperatureSensorEvent;
-import ru.yandex.practicum.model.sensor.enums.SensorEventType;
+
+import java.time.Instant;
 
 @Slf4j
 @Component
 public class TemperatureSensorEventMapper extends BaseSensorEventMapper<TemperatureSensorAvro> {
 
     @Override
-    protected TemperatureSensorAvro mapToAvroPayload(SensorEvent event) {
-        TemperatureSensorEvent sensorEvent = (TemperatureSensorEvent) event;
+    protected TemperatureSensorAvro mapToAvroPayload(SensorEventProto event) {
+        TemperatureSensorProto sensorEvent = event.getTemperatureSensor();
         log.info("Маппим событие от датчиков в объект типа {}", TemperatureSensorAvro.class.getSimpleName());
         return TemperatureSensorAvro.newBuilder()
-                .setId(sensorEvent.getId())
-                .setHubId(sensorEvent.getHubId())
-                .setTimestamp(sensorEvent.getTimestamp())
+                .setId(event.getId())
+                .setHubId(event.getHubId())
+                .setTimestamp(Instant.ofEpochSecond(
+                        event.getTimestamp().getSeconds(),
+                        event.getTimestamp().getNanos()))
                 .setTemperatureC(sensorEvent.getTemperatureC())
                 .setTemperatureF(sensorEvent.getTemperatureF())
                 .build();
     }
 
     @Override
-    public SensorEventType getSensorEventType() {
-        return SensorEventType.TEMPERATURE_SENSOR_EVENT;
+    public SensorEventProto.PayloadCase getSensorEventType() {
+        return SensorEventProto.PayloadCase.TEMPERATURE_SENSOR;
     }
 }

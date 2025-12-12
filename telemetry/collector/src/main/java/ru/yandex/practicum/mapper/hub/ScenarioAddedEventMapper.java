@@ -3,10 +3,9 @@ package ru.yandex.practicum.mapper.hub;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.ScenarioAddedEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.ScenarioAddedEventAvro;
-import ru.yandex.practicum.model.hub.HubEvent;
-import ru.yandex.practicum.model.hub.ScenarioAddedEvent;
-import ru.yandex.practicum.model.hub.enums.HubEventType;
 
 @Slf4j
 @Component
@@ -16,18 +15,18 @@ public class ScenarioAddedEventMapper extends BaseHubEventMapper<ScenarioAddedEv
     private final DeviceActionMapper deviceActionMapper;
 
     @Override
-    protected ScenarioAddedEventAvro mapToAvroPayload(HubEvent event) {
-        ScenarioAddedEvent scenarioAddedEvent = (ScenarioAddedEvent) event;
+    protected ScenarioAddedEventAvro mapToAvroPayload(HubEventProto event) {
+        ScenarioAddedEventProto scenarioAddedEvent = event.getScenarioAdded();
         log.info("Маппим событие от хабов в объект типа {}", ScenarioAddedEventAvro.class.getSimpleName());
         return ScenarioAddedEventAvro.newBuilder()
                 .setName(scenarioAddedEvent.getName())
-                .setConditions(scenarioConditionMapper.mapToAvro(scenarioAddedEvent.getConditions()))
-                .setActions(deviceActionMapper.mapToAvro(scenarioAddedEvent.getActions()))
+                .setConditions(scenarioConditionMapper.mapToAvro(scenarioAddedEvent.getConditionList()))
+                .setActions(deviceActionMapper.mapToAvro(scenarioAddedEvent.getActionList()))
                 .build();
     }
 
     @Override
-    public HubEventType getHubEventType() {
-        return HubEventType.SCENARIO_ADDED;
+    public HubEventProto.PayloadCase getHubEventType() {
+        return HubEventProto.PayloadCase.SCENARIO_ADDED;
     }
 }
