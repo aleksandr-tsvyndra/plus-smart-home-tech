@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,14 +28,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto getUserShoppingCart(String username) {
         checkUsername(username);
-        return shoppingCartMapper.mapToShoppingCartDto(getActiveShoppingCartByUserName(username));
+        return shoppingCartMapper.toDto(getActiveShoppingCartByUserName(username));
     }
 
     @Override
     public ShoppingCartDto putProductInShoppingCart(String username, Map<UUID, Integer> products) {
         checkUsername(username);
         if (products == null || products.isEmpty()) {
-            throw new IllegalArgumentException("Мапа добавляемых товаров не может быть null или пустой");
+            throw new ValidationException("Мапа добавляемых товаров не может быть null или пустой");
         }
         ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
         shoppingCart.getProducts().putAll(products);
@@ -42,7 +43,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         // здесь должна быть логика, отвечающая за проверку наличия товара на складе
         shoppingCart = shoppingCartRepo.save(shoppingCart);
         log.info("Сохранили обновлённую корзину в БД");
-        return shoppingCartMapper.mapToShoppingCartDto(shoppingCart);
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Override
@@ -58,7 +59,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto removeProductFromShoppingCart(String username, List<UUID> productsId) {
         checkUsername(username);
         if (productsId == null || productsId.isEmpty()) {
-            throw new IllegalArgumentException("Список удаляемых товаров не может быть null или пустым");
+            throw new ValidationException("Список удаляемых товаров не может быть null или пустым");
         }
         ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
         if (shoppingCart.getProducts().isEmpty()) {
@@ -69,7 +70,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
         shoppingCart = shoppingCartRepo.save(shoppingCart);
         log.info("Товар был успешно удалён из корзины");
-        return shoppingCartMapper.mapToShoppingCartDto(shoppingCart);
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 
     @Override
@@ -85,7 +86,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         // здесь должна быть логика, отвечающая за проверку наличия товара на складе
         shoppingCart = shoppingCartRepo.save(shoppingCart);
         log.info("Сохранили корзину с изменённым количеством товара в БД");
-        return shoppingCartMapper.mapToShoppingCartDto(shoppingCart);
+        return shoppingCartMapper.toDto(shoppingCart);
     }
 
     private void checkUsername(String username) {

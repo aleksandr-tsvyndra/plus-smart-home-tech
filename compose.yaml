@@ -36,11 +36,11 @@ services:
 
   db:
     image: postgres:16.1
-    container_name: postgres-analyzer-db
+    container_name: postgres-smart-home-tech-db
     ports:
       - "5433:5432"
     environment:
-      - POSTGRES_DB=analyzer
+      - POSTGRES_DB=smart-home-tech
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
     healthcheck:

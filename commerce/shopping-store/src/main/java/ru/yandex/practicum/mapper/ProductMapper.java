@@ -1,18 +1,19 @@
 package ru.yandex.practicum.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
 import ru.yandex.practicum.model.Product;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ProductMapper {
 
-    Product mapToProduct(ProductDto dto);
+    Product toEntity(ProductDto dto);
 
-    ProductDto mapToProductDto(Product product);
+    ProductDto toDto(Product product);
 
-    List<ProductDto> mapToProductDto(List<Product> products);
+    List<ProductDto> toDtoList(List<Product> products);
 
 }

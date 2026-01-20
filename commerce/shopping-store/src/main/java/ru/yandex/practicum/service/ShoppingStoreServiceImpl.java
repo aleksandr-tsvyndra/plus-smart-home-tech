@@ -1,5 +1,6 @@
 package ru.yandex.practicum.service;
 
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         if (products.isEmpty()) {
             throw new ProductNotFoundException("Не найдено товаров категории: " + productCategory);
         }
-        return productMapper.mapToProductDto(products);
+        return productMapper.toDtoList(products);
     }
 
     @Override
@@ -40,34 +41,34 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Товара с id=" + id + " нет в наличии"));
         log.info("Мапим найденный товар в ProductDto и возвращаем его в http-ответе");
-        return productMapper.mapToProductDto(product);
+        return productMapper.toDto(product);
     }
 
     @Override
     public ProductDto addNewProduct(ProductDto dto) {
         if (dto.getProductId() != null) {
-            throw new IllegalArgumentException("При создании товара поле productId должно быть null");
+            throw new ValidationException("При создании товара поле productId должно быть null");
         }
-        Product newProduct = productRepository.save(productMapper.mapToProduct(dto));
+        Product newProduct = productRepository.save(productMapper.toEntity(dto));
         log.info("В БД магазина добавлен новый товар: {}", newProduct);
-        return productMapper.mapToProductDto(newProduct);
+        return productMapper.toDto(newProduct);
     }
 
     @Override
     public ProductDto updateProduct(ProductDto dto) {
         if (dto.getProductId() == null || dto.getProductId().isBlank()) {
-            throw new IllegalArgumentException("При обновлении товара поле productId не может быть пустым");
+            throw new ValidationException("При обновлении товара поле productId не может быть пустым");
         }
         UUID productId = UUID.fromString(dto.getProductId());
         if (productRepository.findById(productId).isEmpty()) {
             throw new ProductNotFoundException("В БД нет товара с id=" + productId + " для обновления");
         }
-        Product product = productMapper.mapToProduct(dto);
+        Product product = productMapper.toEntity(dto);
         product.setProductId(productId);
         log.info("Обновляем в БД товар с id={}...", productId);
         Product updatedProduct = productRepository.save(product);
         log.info("Товар успешно обновлен: {}", updatedProduct);
-        return productMapper.mapToProductDto(updatedProduct);
+        return productMapper.toDto(updatedProduct);
     }
 
     @Override
@@ -75,12 +76,12 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("В БД нет товара с id=" + productId + " для удаления"));
         log.info("Удаляем товар с id={}...", productId);
-        if (!product.getProductState().equals(ProductState.DEACTIVATE)) {
+        if (product.getProductState() != ProductState.DEACTIVATE) {
             product.setProductState(ProductState.DEACTIVATE);
             product = productRepository.save(product);
             log.info("Товар с id={} успешно удалён", productId);
         }
-        return product.getProductState().equals(ProductState.DEACTIVATE);
+        return product.getProductState() == ProductState.DEACTIVATE;
     }
 
     @Override
@@ -89,11 +90,11 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
                 .orElseThrow(() -> new ProductNotFoundException("В БД нет товара с id="
                         + quantityStateRequest.getProductId() + " для изменения доступного количества"));
         log.info("Меняем доступное количество товара с id={}", quantityStateRequest.getProductId());
-        if (!product.getQuantityState().equals(quantityStateRequest.getQuantityState())) {
+        if (product.getQuantityState() != quantityStateRequest.getQuantityState()) {
             product.setQuantityState(quantityStateRequest.getQuantityState());
             product = productRepository.save(product);
             log.info("Товар с обновленным доступным количеством: {}", product);
         }
-        return product.getQuantityState().equals(quantityStateRequest.getQuantityState());
+        return product.getQuantityState() == quantityStateRequest.getQuantityState();
     }
 }
