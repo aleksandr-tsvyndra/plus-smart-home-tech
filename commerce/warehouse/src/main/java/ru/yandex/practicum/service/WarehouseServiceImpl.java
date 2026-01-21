@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
+import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -11,6 +13,7 @@ import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.feignClient.ShoppingStoreFeignClient;
 import ru.yandex.practicum.mapper.WarehouseMapper;
 import ru.yandex.practicum.model.WarehouseProduct;
 import ru.yandex.practicum.repository.WarehouseRepository;
@@ -31,6 +34,7 @@ import java.util.stream.Collectors;
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepo;
     private final WarehouseMapper warehouseMapper;
+    private final ShoppingStoreFeignClient storeFeignClient;
 
     private AddressDto warehouseAddress = setAddress();
 
@@ -47,12 +51,14 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCart) {
+        log.info("Проверяем наличие товара на складе...");
         Map<UUID, Integer> productsInCart = shoppingCart.getProducts();
         List<WarehouseProduct> warehouseProducts = warehouseRepo.findAllById(productsInCart.keySet());
         Map<UUID, WarehouseProduct> warehouseProductsMap = warehouseProducts.stream()
                 .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
         checkActiveProductsInWarehouse(productsInCart.keySet(), warehouseProductsMap.keySet());
         checkProductQuantity(productsInCart, warehouseProductsMap);
+        log.info("Товары из корзины в полном объёме имеются в наличии на складе");
         return buildBookedProductsDto(warehouseProducts);
     }
 
@@ -63,8 +69,9 @@ public class WarehouseServiceImpl implements WarehouseService {
                 .orElseThrow(() -> new NoSpecifiedProductInWarehouseException("Товара с id=" + id + " нет на складе"));
         log.info("Изменяем количество товара на складе на {} единицы", request.getQuantity());
         product.setQuantity(product.getQuantity() + request.getQuantity());
-        warehouseRepo.save(product);
+        product = warehouseRepo.save(product);
         log.info("Товара с id={} на складе стало: {} штук", id, request.getQuantity());
+        setProductQuantityState(product);
     }
 
     @Override
@@ -118,5 +125,19 @@ public class WarehouseServiceImpl implements WarehouseService {
         }
         log.info("Общие сведения о зарезервированных товарах по корзине: {}", result);
         return result;
+    }
+
+    private void setProductQuantityState(WarehouseProduct product) {
+        QuantityState quantityState;
+        if (product.getQuantity() == 0) {
+            quantityState = QuantityState.ENDED;
+        } else if (product.getQuantity() < 10) {
+            quantityState = QuantityState.FEW;
+        } else if (product.getQuantity() < 100) {
+            quantityState = QuantityState.ENOUGH;
+        } else {
+            quantityState = QuantityState.MANY;
+        }
+        storeFeignClient.setProductQuantityState(new SetProductQuantityStateRequest(product.getProductId(), quantityState));
     }
 }

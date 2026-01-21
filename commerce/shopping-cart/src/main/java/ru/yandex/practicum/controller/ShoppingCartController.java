@@ -1,16 +1,9 @@
 package ru.yandex.practicum.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.api.ShoppingCartApi;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.service.ShoppingCartService;
@@ -22,40 +15,36 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/shopping-cart")
-public class ShoppingCartController {
+public class ShoppingCartController implements ShoppingCartApi {
     private final ShoppingCartService cartService;
 
-    @GetMapping
-    public ShoppingCartDto getUserShoppingCart(@RequestParam(name = "username") String username) {
+    @Override
+    public ShoppingCartDto getUserShoppingCart(String username) {
         log.info("Получение актуальной корзины для авторизованного юзера {}", username);
         return cartService.getUserShoppingCart(username);
     }
 
-    @PutMapping
-    public ShoppingCartDto putProductInShoppingCart(@RequestParam(name = "username") String username,
-                                                    @RequestBody Map<UUID, Integer> products) {
+    @Override
+    public ShoppingCartDto putProductInShoppingCart(String username, Map<UUID, Integer> products) {
         log.info("Добавление в корзину юзера {} следующих товаров: {}", username, products);
         return cartService.putProductInShoppingCart(username, products);
     }
 
-    @DeleteMapping
-    public void deactivateUserShoppingCart(@RequestParam(name = "username") String username) {
+    @Override
+    public void deactivateUserShoppingCart(String username) {
         log.info("Деактивирование корзины товаров для юзера {}", username);
         cartService.deactivateUserShoppingCart(username);
     }
 
-    @PostMapping("/remove")
-    public ShoppingCartDto removeProductFromShoppingCart(@RequestParam(name = "username") String username,
-                                                         @RequestBody List<UUID> productsId) {
+    @Override
+    public ShoppingCartDto removeProductFromShoppingCart(String username, List<UUID> productsId) {
         log.info("Удаление из корзины юзера {} товаров с id: {}", username, productsId);
         return cartService.removeProductFromShoppingCart(username, productsId);
     }
 
-    @PostMapping("/change-quantity")
-    public ShoppingCartDto changeProductQuantityInShoppingCart(
-            @RequestParam(name = "username") String username,
-            @Valid @RequestBody ChangeProductQuantityRequest productQuantity) {
+    @Override
+    public ShoppingCartDto changeProductQuantityInShoppingCart(String username,
+                                                               ChangeProductQuantityRequest productQuantity) {
         log.info("Изменение количества товаров в корзине юзера {}", username);
         return cartService.changeProductQuantityInShoppingCart(username, productQuantity);
     }

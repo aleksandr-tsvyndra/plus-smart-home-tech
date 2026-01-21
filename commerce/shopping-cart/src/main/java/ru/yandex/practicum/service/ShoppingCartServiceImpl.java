@@ -9,6 +9,7 @@ import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartState;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
+import ru.yandex.practicum.feignClient.WarehouseFeignClient;
 import ru.yandex.practicum.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.model.ShoppingCart;
 import ru.yandex.practicum.repository.ShoppingCartRepository;
@@ -25,6 +26,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final ShoppingCartRepository shoppingCartRepo;
     private final ShoppingCartMapper shoppingCartMapper;
 
+    private final WarehouseFeignClient warehouseFeignClient;
+
     @Override
     public ShoppingCartDto getUserShoppingCart(String username) {
         checkUsername(username);
@@ -40,7 +43,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
         shoppingCart.getProducts().putAll(products);
         log.info("В корзину юзера добавился новый товар: {}", products);
-        // здесь должна быть логика, отвечающая за проверку наличия товара на складе
+        warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
         shoppingCart = shoppingCartRepo.save(shoppingCart);
         log.info("Сохранили обновлённую корзину в БД");
         return shoppingCartMapper.toDto(shoppingCart);
@@ -83,7 +86,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         }
         shoppingCart.getProducts().put(prodQuantity.getProductId(), prodQuantity.getNewQuantity());
         log.info("Товар с id {} обновил количество: {}", prodQuantity.getProductId(), prodQuantity.getNewQuantity());
-        // здесь должна быть логика, отвечающая за проверку наличия товара на складе
+        warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
         shoppingCart = shoppingCartRepo.save(shoppingCart);
         log.info("Сохранили корзину с изменённым количеством товара в БД");
         return shoppingCartMapper.toDto(shoppingCart);
