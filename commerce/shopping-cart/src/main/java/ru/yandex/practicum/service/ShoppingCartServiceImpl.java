@@ -53,7 +53,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void deactivateUserShoppingCart(String username) {
         checkUsername(username);
         ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
-        shoppingCart.setCartState(CartState.DEACTIVATED);
+        shoppingCart.setCartState(CartState.DEACTIVATE);
         shoppingCartRepo.save(shoppingCart);
         log.info("Корзина юзера {} деактивирована", username);
     }
