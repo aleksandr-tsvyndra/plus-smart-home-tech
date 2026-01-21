@@ -10,6 +10,6 @@ import java.util.UUID;
 
 public interface ProductRepository extends JpaRepository<Product, UUID> {
 
-    List<Product> findAllByProductCategory(ProductCategory category, Pageable pageable);
+    List<Product> findAllByProductCategory(ProductCategory productCategory, Pageable pageable);
 
 }

@@ -1,5 +1,5 @@
 package ru.yandex.practicum.dto.shoppingCart;
 
-public enum ShoppingCartState {
+public enum CartState {
     ACTIVE, DEACTIVATED
 }

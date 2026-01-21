@@ -4,9 +4,9 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.dto.shoppingCart.CartState;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.shoppingCart.ShoppingCartState;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
 import ru.yandex.practicum.feignClient.WarehouseFeignClient;
@@ -53,7 +53,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void deactivateUserShoppingCart(String username) {
         checkUsername(username);
         ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
-        shoppingCart.setCartState(ShoppingCartState.DEACTIVATED);
+        shoppingCart.setCartState(CartState.DEACTIVATED);
         shoppingCartRepo.save(shoppingCart);
         log.info("Корзина юзера {} деактивирована", username);
     }
@@ -100,13 +100,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     private ShoppingCart getActiveShoppingCartByUserName(String username) {
-        var shoppingCartOpt = shoppingCartRepo.findByUsernameAndShoppingCartState(username, ShoppingCartState.ACTIVE);
+        var shoppingCartOpt = shoppingCartRepo.findByUsernameAndCartState(username, CartState.ACTIVE);
         ShoppingCart shoppingCart;
         if (shoppingCartOpt.isEmpty()) {
             log.info("У юзера {} нет активной корзины", username);
             shoppingCart = new ShoppingCart();
             shoppingCart.setUsername(username);
-            shoppingCart.setCartState(ShoppingCartState.ACTIVE);
+            shoppingCart.setCartState(CartState.ACTIVE);
             shoppingCart.setProducts(new HashMap<>());
             shoppingCart = shoppingCartRepo.save(shoppingCart);
             log.info("Новая активная корзина юзера: {}", shoppingCart);

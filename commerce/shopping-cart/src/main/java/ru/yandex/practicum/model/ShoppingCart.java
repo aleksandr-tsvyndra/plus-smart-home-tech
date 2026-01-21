@@ -15,7 +15,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.dto.shoppingCart.ShoppingCartState;
+import ru.yandex.practicum.dto.shoppingCart.CartState;
 
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +33,7 @@ public class ShoppingCart {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "cart_state")
-    private ShoppingCartState cartState;
+    private CartState cartState;
 
     @ElementCollection
     @CollectionTable(name = "cart_products", joinColumns = @JoinColumn(name = "shopping_cart_id"))
