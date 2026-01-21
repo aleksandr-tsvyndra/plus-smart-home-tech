@@ -16,4 +16,4 @@ spring:
     password: smart-home-tech
 
 server:
-  port: 0
+  port: 9090
