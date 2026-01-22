@@ -14,52 +14,28 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(ValidationException.class)
     public ErrorResponse handleValidationException(ValidationException e) {
-        log.error("Ошибка валидации!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.BAD_REQUEST.toString(),
-                "Произошла ошибка валидации данных.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        log.error("Ошибка валидации данных!", e);
+        return new ErrorResponse("Ошибка валидации данных: " + e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(NoProductsInShoppingCartException.class)
     public ErrorResponse handleNoProductsInShoppingCart(final Exception e) {
         log.error("Ошибка при попытке обратиться к товару, которого нет в корзине!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.BAD_REQUEST.toString(),
-                "Произошла ошибка при обращении к товару, которого нет в корзине.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(NotAuthorizedUserException.class)
     public ErrorResponse handleNotAuthorizedUser(final Exception e) {
         log.error("Ошибка, связанная с авторизацией пользователя!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.UNAUTHORIZED.toString(),
-                "Ошибка при авторизации пользователя.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        return new ErrorResponse("Ошибка авторизации пользователя: " + e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public ErrorResponse handleGenericException(final Exception e) {
         log.error("Внутренняя ошибка сервера!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.INTERNAL_SERVER_ERROR.toString(),
-                "Произошла ошибка на стороне сервера.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        return new ErrorResponse("Ошибка на стороне сервера: " + e.getMessage());
     }
 }

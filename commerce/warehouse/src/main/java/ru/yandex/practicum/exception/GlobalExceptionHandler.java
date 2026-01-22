@@ -15,13 +15,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ValidationException.class)
     public ErrorResponse handleValidationException(ValidationException e) {
         log.error("Ошибка валидации!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.BAD_REQUEST.toString(),
-                "Произошла ошибка валидации данных.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        return new ErrorResponse("Ошибка валидации данных: " + e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -32,25 +26,13 @@ public class GlobalExceptionHandler {
     })
     public ErrorResponse handleProductWarehouseException(final Exception e) {
         log.error("Ошибка, связанная с товаром на складе!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.BAD_REQUEST.toString(),
-                "Произошла ошибка, связанная с товаром на складе.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        return new ErrorResponse("Ошибка, связанная с товаром на складе: " + e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler
     public ErrorResponse handleGenericException(final Exception e) {
         log.error("Внутренняя ошибка сервера!", e);
-        return new ErrorResponse(e.getCause(),
-                e.getStackTrace(),
-                HttpStatus.INTERNAL_SERVER_ERROR.toString(),
-                "Произошла ошибка на стороне сервера.",
-                e.getMessage(),
-                e.getSuppressed(),
-                e.getLocalizedMessage());
+        return new ErrorResponse("Ошибка на стороне сервера: " + e.getMessage());
     }
 }
