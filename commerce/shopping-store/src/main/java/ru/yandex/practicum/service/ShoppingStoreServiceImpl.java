@@ -27,7 +27,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     public List<ProductDto> findAllByProductCategory(ProductCategory productCategory, Pageable pageable) {
         log.info("Ищем товары категории {} в БД...", productCategory);
-        List<Product> products = productRepository.findAllByProductCategory(productCategory, pageable);
+        List<Product> products = productRepository.findAllByProductCategory(productCategory, pageable).toList();
         if (products.isEmpty()) {
             throw new ProductNotFoundException("Не найдено товаров категории: " + productCategory);
         }
