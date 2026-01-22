@@ -1,3 +1,6 @@
+server:
+  port: 11985
+
 spring:
   application:
     name: warehouse
