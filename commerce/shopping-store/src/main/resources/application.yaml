@@ -1,6 +1,3 @@
-server:
-  port: 10651
-
 spring:
   application:
     name: shopping-store

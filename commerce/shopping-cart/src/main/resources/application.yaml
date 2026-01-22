@@ -1,6 +1,3 @@
-server:
-  port: 8979
-
 spring:
   application:
     name: shopping-cart
