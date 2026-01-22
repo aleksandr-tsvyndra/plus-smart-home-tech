@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.shoppingStore.QuantityState;
-import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -138,6 +137,6 @@ public class WarehouseServiceImpl implements WarehouseService {
         } else {
             quantityState = QuantityState.MANY;
         }
-        storeFeignClient.setProductQuantityState(new SetProductQuantityStateRequest(product.getProductId(), quantityState));
+        storeFeignClient.setProductQuantityState(product.getProductId(), quantityState);
     }
 }

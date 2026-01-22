@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.ShoppingStoreApi;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
@@ -50,8 +51,8 @@ public class ShoppingStoreController implements ShoppingStoreApi {
     }
 
     @Override
-    public Boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
+    public Boolean setProductQuantityState(UUID productId, QuantityState quantityState) {
         log.info("Установка статуса количества товара на складе");
-        return storeService.setProductQuantityState(quantityStateRequest);
+        return storeService.setProductQuantityState(new SetProductQuantityStateRequest(productId, quantityState));
     }
 }
