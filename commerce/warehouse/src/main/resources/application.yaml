@@ -15,14 +15,6 @@ spring:
       discovery:
         enabled: true
         serviceId: config-server
-  sql:
-    init:
-      mode: always
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/smart-home-tech
-    username: username
-    password: password
 
 eureka:
   client:
