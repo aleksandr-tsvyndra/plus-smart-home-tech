@@ -102,7 +102,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private void checkProductQuantity(Map<UUID, Integer> cartProds, Map<UUID, WarehouseProduct> warehouseProds) {
         List<UUID> shortage = new ArrayList<>();
         for (var id : cartProds.keySet()) {
-            if (cartProds.get(id) > warehouseProds.get(id).getQuantity()) {
+            if (cartProds.get(id) < warehouseProds.get(id).getQuantity()) {
                 shortage.add(id);
             }
         }
