@@ -2,6 +2,7 @@ package ru.yandex.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.ShoppingStoreApi;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
@@ -11,7 +12,6 @@ import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
 import org.springframework.data.domain.Pageable;
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -21,7 +21,7 @@ public class ShoppingStoreController implements ShoppingStoreApi {
     private final ShoppingStoreService storeService;
 
     @Override
-    public List<ProductDto> findAllByProductCategory(ProductCategory category, Pageable pageable) {
+    public Page<ProductDto> findAllByProductCategory(ProductCategory category, Pageable pageable) {
         log.info("Получение списка товаров по категории в пагинированном виде");
         return storeService.findAllByProductCategory(category, pageable);
     }

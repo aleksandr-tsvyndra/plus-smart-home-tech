@@ -3,6 +3,7 @@ package ru.yandex.practicum.service;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
@@ -14,7 +15,6 @@ import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -25,13 +25,13 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     private final ProductMapper productMapper;
 
     @Override
-    public List<ProductDto> findAllByProductCategory(ProductCategory productCategory, Pageable pageable) {
+    public Page<ProductDto> findAllByProductCategory(ProductCategory productCategory, Pageable pageable) {
         log.info("Ищем товары категории {} в БД...", productCategory);
-        List<Product> products = productRepository.findAllByProductCategory(productCategory, pageable).toList();
+        Page<Product> products = productRepository.findAllByProductCategory(productCategory, pageable);
         if (products.isEmpty()) {
             throw new ProductNotFoundException("Не найдено товаров категории: " + productCategory);
         }
-        return productMapper.toDtoList(products);
+        return products.map(productMapper::toDto);
     }
 
     @Override

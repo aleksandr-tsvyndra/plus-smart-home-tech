@@ -22,10 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -53,10 +51,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         log.info("Проверяем наличие товара на складе...");
         Map<UUID, Integer> productsInCart = shoppingCart.getProducts();
         List<WarehouseProduct> warehouseProducts = warehouseRepo.findAllById(productsInCart.keySet());
-        Map<UUID, WarehouseProduct> warehouseProductsMap = warehouseProducts.stream()
-                .collect(Collectors.toMap(WarehouseProduct::getProductId, Function.identity()));
-        checkActiveProductsInWarehouse(productsInCart.keySet(), warehouseProductsMap.keySet());
-        checkProductQuantity(productsInCart, warehouseProductsMap);
+        checkProductQuantity(productsInCart, warehouseProducts);
         log.info("Товары из корзины в полном объёме имеются в наличии на складе");
         return buildBookedProductsDto(warehouseProducts);
     }
@@ -64,8 +59,8 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public void addMoreProductInWarehouse(AddProductToWarehouseRequest request) {
         UUID id = UUID.fromString(request.getProductId());
-        WarehouseProduct product = warehouseRepo.findById(id)
-                .orElseThrow(() -> new NoSpecifiedProductInWarehouseException("Товара с id=" + id + " нет на складе"));
+        WarehouseProduct product = warehouseRepo.findById(id).orElseThrow(
+                () -> new NoSpecifiedProductInWarehouseException("Товара с id=" + id + " нет на складе"));
         log.info("Изменяем количество товара на складе на {} единицы", request.getQuantity());
         product.setQuantity(product.getQuantity() + request.getQuantity());
         product = warehouseRepo.save(product);
@@ -90,19 +85,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         return addressDto;
     }
 
-    private void checkActiveProductsInWarehouse(Set<UUID> cartProds, Set<UUID> warehouseProds) {
-        cartProds.removeAll(warehouseProds);
-        log.info("Товары из корзины, которых нет на складе: {}", cartProds);
-        if (!cartProds.isEmpty()) {
-            throw new NoSpecifiedProductInWarehouseException("На складе нет следующих товаров: " + cartProds);
-        }
-    }
-
-    private void checkProductQuantity(Map<UUID, Integer> cartProds, Map<UUID, WarehouseProduct> warehouseProds) {
+    private void checkProductQuantity(Map<UUID, Integer> cartProds, List<WarehouseProduct> warehouseProds) {
         List<UUID> shortage = new ArrayList<>();
-        for (var id : cartProds.keySet()) {
-            if (cartProds.get(id) < warehouseProds.get(id).getQuantity()) {
-                shortage.add(id);
+        for (var prod : warehouseProds) {
+            if (prod.getQuantity() < cartProds.get(prod.getProductId())) {
+                shortage.add(prod.getProductId());
             }
         }
         log.info("Товары, которых не хватает на складе: {}", shortage);
