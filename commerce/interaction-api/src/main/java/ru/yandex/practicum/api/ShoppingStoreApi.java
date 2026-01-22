@@ -34,7 +34,7 @@ public interface ShoppingStoreApi {
     @PostMapping("/api/v1/shopping-store/removeProductFromStore")
     Boolean removeProductById(@RequestBody UUID productId);
 
-    @PostMapping("/quantityState")
+    @PostMapping("/api/v1/shopping-store/quantityState")
     Boolean setProductQuantityState(@Valid @RequestBody SetProductQuantityStateRequest quantityStateRequest);
 
 }

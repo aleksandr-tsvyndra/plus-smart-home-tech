@@ -72,7 +72,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     }
 
     @Override
-    public boolean removeProductById(UUID productId) {
+    public Boolean removeProductById(UUID productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("В БД нет товара с id=" + productId + " для удаления"));
         log.info("Удаляем товар с id={}...", productId);
@@ -85,7 +85,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     }
 
     @Override
-    public boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
+    public Boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
         Product product = productRepository.findById(quantityStateRequest.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("В БД нет товара с id="
                         + quantityStateRequest.getProductId() + " для изменения доступного количества"));
