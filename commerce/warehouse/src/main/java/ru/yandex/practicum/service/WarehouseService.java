@@ -12,7 +12,7 @@ public interface WarehouseService {
 
     BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCart);
 
-    void addMoreProductInWarehouse(AddProductToWarehouseRequest request);
+    void addProductToWarehouse(AddProductToWarehouseRequest request);
 
     AddressDto getWarehouseAddress();
 

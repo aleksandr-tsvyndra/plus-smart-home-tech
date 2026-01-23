@@ -21,7 +21,7 @@ public class ShoppingStoreController implements ShoppingStoreApi {
     private final ShoppingStoreService storeService;
 
     @Override
-    public Page<ProductDto> findAllByProductCategory(ProductCategory category, Pageable pageable) {
+    public Page<ProductDto> findProductByCategory(ProductCategory category, Pageable pageable) {
         log.info("Получение списка товаров по категории в пагинированном виде");
         return storeService.findAllByProductCategory(category, pageable);
     }

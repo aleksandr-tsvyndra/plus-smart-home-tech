@@ -11,6 +11,7 @@ import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
+import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.feignClient.ShoppingStoreFeignClient;
 import ru.yandex.practicum.mapper.WarehouseMapper;
@@ -37,9 +38,8 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     @Override
     public void addNewProductInWarehouse(NewProductInWarehouseRequest product) {
-        UUID id = UUID.fromString(product.getProductId());
-        if (warehouseRepo.existsById(id)) {
-            throw new SpecifiedProductAlreadyInWarehouseException("Товар с id=" + id + " уже есть на складе");
+        if (warehouseRepo.existsById(product.getProductId())) {
+            throw new SpecifiedProductAlreadyInWarehouseException("Товар с id=" + product.getProductId() + " уже есть на складе");
         }
         WarehouseProduct warehouseProduct = warehouseMapper.toEntity(product);
         log.info("Добавляем в БД склада новый товар");
@@ -57,14 +57,13 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     @Override
-    public void addMoreProductInWarehouse(AddProductToWarehouseRequest request) {
-        UUID id = UUID.fromString(request.getProductId());
-        WarehouseProduct product = warehouseRepo.findById(id).orElseThrow(
-                () -> new NoSpecifiedProductInWarehouseException("Товара с id=" + id + " нет на складе"));
+    public void addProductToWarehouse(AddProductToWarehouseRequest request) {
+        WarehouseProduct product = warehouseRepo.findById(request.getProductId()).orElseThrow(
+                () -> new NoSpecifiedProductInWarehouseException("Товара с id=" + request.getProductId() + " нет на складе!"));
         log.info("Изменяем количество товара на складе на {} единицы", request.getQuantity());
         product.setQuantity(product.getQuantity() + request.getQuantity());
         product = warehouseRepo.save(product);
-        log.info("Товара с id={} на складе стало: {} штук", id, request.getQuantity());
+        log.info("Товара с id={} на складе стало: {} штук", request.getProductId(), request.getQuantity());
         setProductQuantityState(product);
     }
 
@@ -105,7 +104,7 @@ public class WarehouseServiceImpl implements WarehouseService {
             result.setDeliveryWeight(result.getDeliveryWeight() + product.getWeight());
             result.setDeliveryVolume(result.getDeliveryVolume()
                     + product.getWidth() * product.getHeight() * product.getDepth());
-            if (product.getFragile()) {
+            if (product.isFragile()) {
                 result.setFragile(true);
             }
         }
@@ -124,6 +123,11 @@ public class WarehouseServiceImpl implements WarehouseService {
         } else {
             quantityState = QuantityState.MANY;
         }
-        storeFeignClient.setProductQuantityState(product.getProductId(), quantityState);
+        try {
+            log.info("Пробуем обновить доступное количество товара в БД витрины...");
+            storeFeignClient.setProductQuantityState(product.getProductId(), quantityState);
+        } catch (ProductNotFoundException e) {
+            log.info("Продавец ещё не успел добавить товар в БД витрины!");
+        }
     }
 }

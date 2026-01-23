@@ -90,11 +90,9 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
                 .orElseThrow(() -> new ProductNotFoundException("В БД нет товара с id="
                         + quantityStateRequest.getProductId() + " для изменения доступного количества"));
         log.info("Меняем доступное количество товара с id={}", quantityStateRequest.getProductId());
-        if (product.getQuantityState() != quantityStateRequest.getQuantityState()) {
-            product.setQuantityState(quantityStateRequest.getQuantityState());
-            product = productRepository.save(product);
-            log.info("Товар с обновленным доступным количеством: {}", product);
-        }
+        product.setQuantityState(quantityStateRequest.getQuantityState());
+        product = productRepository.save(product);
+        log.info("Товар с обновленным доступным количеством: {}", product);
         return product.getQuantityState() == quantityStateRequest.getQuantityState();
     }
 }

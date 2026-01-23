@@ -18,15 +18,15 @@ public class WarehouseProduct {
     @Column(name = "product_id")
     private UUID productId;
 
-    private Double width;
+    private double width;
 
-    private Double height;
+    private double height;
 
-    private Double depth;
+    private double depth;
 
-    private Double weight;
+    private double weight;
 
-    private Boolean fragile;
+    private boolean fragile;
 
-    private Integer quantity;
+    private int quantity;
 }

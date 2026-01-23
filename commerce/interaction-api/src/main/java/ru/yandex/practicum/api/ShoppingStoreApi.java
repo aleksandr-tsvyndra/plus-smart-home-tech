@@ -23,7 +23,7 @@ import java.util.UUID;
 public interface ShoppingStoreApi {
 
     @GetMapping("/api/v1/shopping-store")
-    Page<ProductDto> findAllByProductCategory(@RequestParam(name = "category") ProductCategory category,
+    Page<ProductDto> findProductByCategory(@RequestParam(name = "category") ProductCategory category,
                                               @PageableDefault(sort = {"productName"}) Pageable pageable);
 
     @GetMapping("/api/v1/shopping-store/{productId}")

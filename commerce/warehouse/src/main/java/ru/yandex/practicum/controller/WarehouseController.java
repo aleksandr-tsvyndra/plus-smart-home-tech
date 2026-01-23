@@ -30,9 +30,9 @@ public class WarehouseController implements WarehouseApi {
     }
 
     @Override
-    public void addMoreProductInWarehouse(AddProductToWarehouseRequest request) {
+    public void addProductToWarehouse(AddProductToWarehouseRequest request) {
         log.info("Запрос на увеличение единиц товара c id={}", request.getProductId());
-        warehouseService.addMoreProductInWarehouse(request);
+        warehouseService.addProductToWarehouse(request);
     }
 
     @Override
