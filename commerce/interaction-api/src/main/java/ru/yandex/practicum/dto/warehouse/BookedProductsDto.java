@@ -1,7 +1,5 @@
 package ru.yandex.practicum.dto.warehouse;
 
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,14 +10,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookedProductsDto {
-    @Positive
-    @NotNull
-    private Double deliveryWeight;
+    private double deliveryWeight;
 
-    @Positive
-    @NotNull
-    private Double deliveryVolume;
+    private double deliveryVolume;
 
-    @NotNull
-    private Boolean fragile;
+    private boolean fragile;
 }

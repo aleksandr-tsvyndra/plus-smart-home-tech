@@ -29,11 +29,12 @@ public class ShoppingCart {
     @Column(name = "shopping_cart_id", updatable = false, nullable = false)
     private UUID shoppingCartId;
 
+    @Column(nullable = false)
     private String username;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "cart_state")
-    private CartState cartState;
+    @Column(name = "cart_state", nullable = false)
+    private CartState cartState = CartState.ACTIVE;
 
     @ElementCollection
     @CollectionTable(name = "cart_products", joinColumns = @JoinColumn(name = "shopping_cart_id"))
