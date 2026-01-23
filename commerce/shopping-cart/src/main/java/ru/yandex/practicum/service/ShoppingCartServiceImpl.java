@@ -7,8 +7,10 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.shoppingCart.CartState;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
+import ru.yandex.practicum.exception.DeactivatedShoppingCartException;
 import ru.yandex.practicum.exception.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.NotAuthorizedUserException;
+import ru.yandex.practicum.exception.ShoppingCartNotFoundException;
 import ru.yandex.practicum.feignClient.WarehouseFeignClient;
 import ru.yandex.practicum.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.model.ShoppingCart;
@@ -29,19 +31,19 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final WarehouseFeignClient warehouseFeignClient;
 
     @Override
-    public ShoppingCartDto getUserShoppingCart(String username) {
+    public ShoppingCartDto getShoppingCart(String username) {
         checkUsername(username);
-        return shoppingCartMapper.toDto(getActiveShoppingCartByUserName(username));
+        return shoppingCartMapper.toDto(getShoppingCartByUsername(username));
     }
 
     @Override
-    public ShoppingCartDto putProductInShoppingCart(String username, Map<UUID, Integer> products) {
+    public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
         checkUsername(username);
         if (products == null || products.isEmpty()) {
-            throw new ValidationException("Мапа добавляемых товаров не может быть null или пустой");
+            throw new ValidationException("Мапа добавляемых товаров не может быть null или пустой!");
         }
         ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
-        shoppingCart.getProducts().putAll(products);
+        putProductsToUserShoppingCart(shoppingCart, products);
         log.info("В корзину юзера добавился новый товар: {}", products);
         warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
         shoppingCart = shoppingCartRepo.save(shoppingCart);
@@ -50,9 +52,12 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     }
 
     @Override
-    public void deactivateUserShoppingCart(String username) {
+    public void deactivateShoppingCart(String username) {
         checkUsername(username);
-        ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
+        ShoppingCart shoppingCart = getShoppingCartByUsername(username);
+        if (shoppingCart.getCartState() == CartState.DEACTIVATE) {
+            throw new DeactivatedShoppingCartException("Деактивация невозможна! Корзина уже была деактивирована.");
+        }
         shoppingCart.setCartState(CartState.DEACTIVATE);
         shoppingCartRepo.save(shoppingCart);
         log.info("Корзина юзера {} деактивирована", username);
@@ -62,11 +67,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto removeProductFromShoppingCart(String username, List<UUID> productsId) {
         checkUsername(username);
         if (productsId == null || productsId.isEmpty()) {
-            throw new ValidationException("Список удаляемых товаров не может быть null или пустым");
+            throw new ValidationException("Список удаляемых товаров не может быть null или пустым!");
         }
-        ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
+        ShoppingCart shoppingCart = getShoppingCartByUsername(username);
+        if (shoppingCart.getCartState() == CartState.DEACTIVATE) {
+            throw new DeactivatedShoppingCartException("Нельзя удалить товар из деактивированной корзины!");
+        }
         if (shoppingCart.getProducts().isEmpty()) {
-            throw new NoProductsInShoppingCartException("В корзине пусто");
+            throw new NoProductsInShoppingCartException("В корзине пусто! Удаление товара невозможно.");
         }
         for (var id : productsId) {
             shoppingCart.getProducts().remove(id);
@@ -80,22 +88,24 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto changeProductQuantityInShoppingCart(String username,
                                                                ChangeProductQuantityRequest prodQuantity) {
         checkUsername(username);
-        ShoppingCart shoppingCart = getActiveShoppingCartByUserName(username);
-        if (!shoppingCart.getProducts().containsKey(prodQuantity.getProductId())) {
-            throw new NoProductsInShoppingCartException("В корзине нет товара с id=" + prodQuantity.getProductId());
+        ShoppingCart shoppingCart = getShoppingCartByUsername(username);
+        if (shoppingCart.getCartState() == CartState.DEACTIVATE) {
+            throw new DeactivatedShoppingCartException("Нельзя менять количество товара в деактивированной корзине!");
         }
-        shoppingCart.getProducts().put(prodQuantity.getProductId(), prodQuantity.getNewQuantity());
-        log.info("Товар с id {} обновил количество: {}", prodQuantity.getProductId(), prodQuantity.getNewQuantity());
-        warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
-        shoppingCart = shoppingCartRepo.save(shoppingCart);
-        log.info("Сохранили корзину с изменённым количеством товара в БД");
+        if (shoppingCart.getProducts().containsKey(prodQuantity.getProductId())) {
+            shoppingCart.getProducts().put(prodQuantity.getProductId(), prodQuantity.getNewQuantity());
+            log.info("Товар с id {} обновил количество: {}", prodQuantity.getProductId(), prodQuantity.getNewQuantity());
+            warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
+            shoppingCart = shoppingCartRepo.save(shoppingCart);
+            log.info("Сохранили корзину с изменённым количеством товара в БД");
+        }
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
     private void checkUsername(String username) {
         log.info("Проверка имени пользователя: {}", username);
         if (username == null || username.isBlank()) {
-            throw new NotAuthorizedUserException("Имя пользователя не может быть null или пустым");
+            throw new NotAuthorizedUserException("Имя пользователя не может быть null или пустым!");
         }
     }
 
@@ -108,12 +118,26 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             shoppingCart.setUsername(username);
             shoppingCart.setCartState(CartState.ACTIVE);
             shoppingCart.setProducts(new HashMap<>());
-            shoppingCart = shoppingCartRepo.save(shoppingCart);
             log.info("Новая активная корзина юзера: {}", shoppingCart);
         } else {
             shoppingCart = shoppingCartOpt.get();
             log.info("Активная корзина юзера: {}", shoppingCart);
         }
         return shoppingCart;
+    }
+
+    private ShoppingCart getShoppingCartByUsername(String username) {
+        return shoppingCartRepo.findByUsername(username).orElseThrow(
+                () -> new ShoppingCartNotFoundException("Корзина не найдена!"));
+    }
+
+    private void putProductsToUserShoppingCart(ShoppingCart shoppingCart, Map<UUID, Integer> products) {
+        for (var id : products.keySet()) {
+            if (shoppingCart.getProducts().containsKey(id)) {
+                shoppingCart.getProducts().put(id, shoppingCart.getProducts().get(id) + products.get(id));
+            } else {
+                shoppingCart.getProducts().put(id, products.get(id));
+            }
+        }
     }
 }

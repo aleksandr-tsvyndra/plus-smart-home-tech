@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({DeactivatedShoppingCartException.class, ShoppingCartNotFoundException.class})
+    public ErrorResponse handleShoppingCartException(final Exception e) {
+        log.error("Ошибка при взаимодействии с корзиной!", e);
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler(NotAuthorizedUserException.class)
     public ErrorResponse handleNotAuthorizedUser(final Exception e) {

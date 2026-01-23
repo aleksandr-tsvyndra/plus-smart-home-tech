@@ -19,21 +19,21 @@ public class ShoppingCartController implements ShoppingCartApi {
     private final ShoppingCartService cartService;
 
     @Override
-    public ShoppingCartDto getUserShoppingCart(String username) {
+    public ShoppingCartDto getShoppingCart(String username) {
         log.info("Получение актуальной корзины для авторизованного юзера {}", username);
-        return cartService.getUserShoppingCart(username);
+        return cartService.getShoppingCart(username);
     }
 
     @Override
-    public ShoppingCartDto putProductInShoppingCart(String username, Map<UUID, Integer> products) {
+    public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
         log.info("Добавление в корзину юзера {} следующих товаров: {}", username, products);
-        return cartService.putProductInShoppingCart(username, products);
+        return cartService.addProductToShoppingCart(username, products);
     }
 
     @Override
-    public void deactivateUserShoppingCart(String username) {
+    public void deactivateShoppingCart(String username) {
         log.info("Деактивирование корзины товаров для юзера {}", username);
-        cartService.deactivateUserShoppingCart(username);
+        cartService.deactivateShoppingCart(username);
     }
 
     @Override
