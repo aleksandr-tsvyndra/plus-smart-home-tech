@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 // Данный класс реализован лишь из-за того, что при Postman-тестах объект Page при сериализации
 // в json возвращает неправильный набор полей в объекте Sort
@@ -31,7 +30,7 @@ public class PageResponse<T> {
         this.size = page.getSize();
         this.content = page.getContent();
         this.number = page.getNumber();
-        this.sort = new SortView(page.getSort());
+        this.sort = new SortView(page.getSort().toList());
         this.numberOfElements = page.getNumberOfElements();
         this.first = page.isFirst();
         this.last = page.isLast();
@@ -45,16 +44,20 @@ public class PageResponse<T> {
 
     @Getter @ToString
     static class SortView {
-        private final Stream<Sort.Order> orders;
-        private final boolean sorted;
-        private final boolean unsorted;
-        private final boolean empty;
+        private final Sort.Direction direction;
+        private final String property;
+        private final boolean ignoreCase;
+        private final Sort.NullHandling nullHandling;
+        private final boolean ascending;
+        private final boolean descending;
 
-        public SortView(Sort sort) {
-            this.orders = sort.stream();
-            this.sorted = sort.isSorted();
-            this.unsorted = sort.isUnsorted();
-            this.empty = sort.isEmpty();
+        public SortView(List<Sort.Order> orders) {
+            this.direction = orders.getFirst().getDirection();
+            this.property = orders.getFirst().getProperty();
+            this.ignoreCase = orders.getFirst().isIgnoreCase();
+            this.nullHandling = orders.getFirst().getNullHandling();
+            this.ascending = orders.getFirst().isAscending();
+            this.descending = orders.getFirst().isDescending();
         }
     }
 
@@ -70,7 +73,7 @@ public class PageResponse<T> {
         public PageableView(Pageable pageable) {
             this.pageNumber = pageable.getPageNumber();
             this.pageSize = pageable.getPageSize();
-            this.sort = new SortView(pageable.getSort());
+            this.sort = new SortView(pageable.getSort().toList());
             this.offset = pageable.getOffset();
             this.paged = pageable.isPaged();
             this.unpaged = pageable.isUnpaged();
