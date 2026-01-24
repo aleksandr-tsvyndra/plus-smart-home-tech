@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.dto.shoppingCart.CartState;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.exception.DeactivatedShoppingCartException;
-import ru.yandex.practicum.exception.NotAuthorizedUserException;
-import ru.yandex.practicum.exception.ShoppingCartNotFoundException;
+import ru.yandex.practicum.exception.shoppingCart.DeactivatedShoppingCartException;
+import ru.yandex.practicum.exception.shoppingCart.NotAuthorizedUserException;
+import ru.yandex.practicum.exception.shoppingCart.ShoppingCartNotFoundException;
 import ru.yandex.practicum.feignClient.WarehouseFeignClient;
 import ru.yandex.practicum.mapper.ShoppingCartMapper;
 import ru.yandex.practicum.model.ShoppingCart;
@@ -38,9 +38,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
         checkUsername(username);
         ShoppingCart shoppingCart = getActiveShoppingCartByUsername(username);
+        warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
         putProductsToUserShoppingCart(shoppingCart, products);
         log.info("В корзину юзера добавился новый товар: {}", products);
-        warehouseFeignClient.checkProductQuantityInWarehouse(shoppingCartMapper.toDto(shoppingCart));
         shoppingCart = shoppingCartRepo.save(shoppingCart);
         log.info("Сохранили обновлённую корзину в БД");
         return shoppingCartMapper.toDto(shoppingCart);

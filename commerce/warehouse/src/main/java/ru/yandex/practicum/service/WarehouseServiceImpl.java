@@ -8,9 +8,9 @@ import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
-import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
-import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
-import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
+import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
+import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouse;
+import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.mapper.WarehouseMapper;
 import ru.yandex.practicum.model.WarehouseProduct;
 import ru.yandex.practicum.repository.WarehouseRepository;
@@ -94,7 +94,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     private BookedProductsDto buildBookedProductsDto(List<WarehouseProduct> products) {
-        BookedProductsDto result = new BookedProductsDto(0.0, 0.0, false);
+        BookedProductsDto result = new BookedProductsDto();
         for (var product : products) {
             result.setDeliveryWeight(result.getDeliveryWeight() + product.getWeight());
             result.setDeliveryVolume(result.getDeliveryVolume()

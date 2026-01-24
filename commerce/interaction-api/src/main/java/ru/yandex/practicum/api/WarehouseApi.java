@@ -17,7 +17,7 @@ public interface WarehouseApi {
     void addNewProductInWarehouse(@Valid @RequestBody NewProductInWarehouseRequest product);
 
     @PostMapping("/api/v1/warehouse/check")
-    BookedProductsDto checkProductQuantityInWarehouse(@Valid @RequestBody ShoppingCartDto shoppingCart);
+    BookedProductsDto checkProductQuantityInWarehouse(@RequestBody ShoppingCartDto shoppingCart);
 
     @PostMapping("/api/v1/warehouse/add")
     void addProductToWarehouse(@Valid @RequestBody AddProductToWarehouseRequest request);

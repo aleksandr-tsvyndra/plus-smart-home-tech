@@ -10,7 +10,7 @@ import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
 import ru.yandex.practicum.dto.shoppingStore.ProductState;
 import ru.yandex.practicum.dto.shoppingStore.SetProductQuantityStateRequest;
-import ru.yandex.practicum.exception.ProductNotFoundException;
+import ru.yandex.practicum.exception.shoppingStore.ProductNotFoundException;
 import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
@@ -28,9 +28,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     public Page<ProductDto> findAllByProductCategory(ProductCategory productCategory, Pageable pageable) {
         log.info("Ищем товары категории {} в БД...", productCategory);
         Page<Product> products = productRepository.findAllByProductCategory(productCategory, pageable);
-        if (products.isEmpty()) {
-            throw new ProductNotFoundException("Не найдено товаров категории: " + productCategory);
-        }
+        log.info("Из БД вернулась следующая коллекция товаров: {}", products.getContent());
         return products.map(productMapper::toDto);
     }
 
