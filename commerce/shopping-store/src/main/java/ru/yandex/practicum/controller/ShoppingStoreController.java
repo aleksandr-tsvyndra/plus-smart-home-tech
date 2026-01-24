@@ -34,12 +34,12 @@ public class ShoppingStoreController {
     private final ShoppingStoreService storeService;
 
     @GetMapping
-    public Page<ProductDto> findProductByCategory(@RequestParam(name = "category") ProductCategory category,
-                                                  @PageableDefault(sort = {"productName"}) Pageable pageable) {
+    public PageResponse<ProductDto> findProductByCategory(@RequestParam(name = "category") ProductCategory category,
+                                                          @PageableDefault(sort = {"productName"}) Pageable pageable) {
         log.info("Получение списка товаров по категории в пагинированном виде");
         Page<ProductDto> products = storeService.findAllByProductCategory(category, pageable);
         log.info("Возвращаемый список товаров категории {}: {}", category, products.getContent());
-        return products;
+        return new PageResponse<>(products);
     }
 
     @GetMapping("/{productId}")
