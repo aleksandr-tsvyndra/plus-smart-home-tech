@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
 import ru.yandex.practicum.dto.shoppingStore.ProductState;
@@ -24,6 +25,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
 
+    @Transactional(readOnly = true)
     @Override
     public Page<ProductDto> findAllByProductCategory(ProductCategory productCategory, Pageable pageable) {
         log.info("Ищем товары категории {} в БД...", productCategory);
@@ -32,6 +34,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return products.map(productMapper::toDto);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public ProductDto findProductById(String productId) {
         UUID id = UUID.fromString(productId);
@@ -42,6 +45,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productMapper.toDto(product);
     }
 
+    @Transactional
     @Override
     public ProductDto addNewProduct(ProductDto dto) {
         if (dto.getProductId() != null) {
@@ -52,6 +56,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productMapper.toDto(newProduct);
     }
 
+    @Transactional
     @Override
     public ProductDto updateProduct(ProductDto dto) {
         if (dto.getProductId() == null || dto.getProductId().isBlank()) {
@@ -69,6 +74,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return productMapper.toDto(updatedProduct);
     }
 
+    @Transactional
     @Override
     public Boolean removeProductById(UUID productId) {
         Product product = productRepository.findById(productId)
@@ -82,6 +88,7 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
         return product.getProductState() == ProductState.DEACTIVATE;
     }
 
+    @Transactional
     @Override
     public Boolean setProductQuantityState(SetProductQuantityStateRequest quantityStateRequest) {
         Product product = productRepository.findById(quantityStateRequest.getProductId())

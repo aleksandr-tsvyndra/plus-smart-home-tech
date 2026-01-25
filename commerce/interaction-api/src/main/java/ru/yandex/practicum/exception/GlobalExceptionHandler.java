@@ -1,6 +1,7 @@
 package ru.yandex.practicum.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,8 +21,8 @@ import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehous
 public class GlobalExceptionHandler {
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(ConstraintViolationException.class)
-    public ErrorResponse handleValidationException(final ConstraintViolationException e) {
+    @ExceptionHandler({ConstraintViolationException.class, ValidationException.class})
+    public ErrorResponse handleValidationException(final ValidationException e) {
         log.error("Ошибка валидации данных!", e);
         return new ErrorResponse("Ошибка валидации данных: " + e.getMessage());
     }

@@ -3,6 +3,7 @@ package ru.yandex.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shoppingCart.CartState;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
@@ -28,12 +29,14 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     private final WarehouseFeignClient warehouseFeignClient;
 
+    @Transactional(readOnly = true)
     @Override
     public ShoppingCartDto getShoppingCart(String username) {
         checkUsername(username);
         return shoppingCartMapper.toDto(getShoppingCartByUsername(username));
     }
 
+    @Transactional
     @Override
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
         checkUsername(username);
@@ -46,6 +49,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
+    @Transactional
     @Override
     public void deactivateShoppingCart(String username) {
         checkUsername(username);
@@ -58,6 +62,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         log.info("Корзина юзера {} деактивирована", username);
     }
 
+    @Transactional
     @Override
     public ShoppingCartDto removeProductFromShoppingCart(String username, List<UUID> productsId) {
         checkUsername(username);
@@ -75,6 +80,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return shoppingCartMapper.toDto(shoppingCart);
     }
 
+    @Transactional
     @Override
     public ShoppingCartDto changeProductQuantityInShoppingCart(String username,
                                                                ChangeProductQuantityRequest prodQuantity) {

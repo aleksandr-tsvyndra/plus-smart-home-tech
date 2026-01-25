@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS shopping_carts (
     shopping_cart_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    username VARCHAR,
-    cart_state VARCHAR
+    username VARCHAR(32),
+    cart_state VARCHAR(10)
 );
 
 CREATE TABLE IF NOT EXISTS cart_products (

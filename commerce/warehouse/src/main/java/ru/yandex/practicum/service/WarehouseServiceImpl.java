@@ -3,6 +3,7 @@ package ru.yandex.practicum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
@@ -32,6 +33,7 @@ public class WarehouseServiceImpl implements WarehouseService {
 
     private AddressDto warehouseAddress = setAddress();
 
+    @Transactional
     @Override
     public void addNewProductInWarehouse(NewProductInWarehouseRequest product) {
         if (warehouseRepo.existsById(product.getProductId())) {
@@ -42,6 +44,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         warehouseRepo.save(warehouseProduct);
     }
 
+    @Transactional
     @Override
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto shoppingCart) {
         log.info("Проверяем наличие товара на складе...");
@@ -52,6 +55,7 @@ public class WarehouseServiceImpl implements WarehouseService {
         return buildBookedProductsDto(warehouseProducts);
     }
 
+    @Transactional
     @Override
     public void addProductToWarehouse(AddProductToWarehouseRequest request) {
         WarehouseProduct product = warehouseRepo.findById(request.getProductId()).orElseThrow(
