@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.exception.order.NoOrderFoundException;
 import ru.yandex.practicum.exception.shoppingCart.DeactivatedShoppingCartException;
 import ru.yandex.practicum.exception.shoppingCart.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.shoppingCart.NotAuthorizedUserException;
@@ -28,9 +29,9 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({ProductNotFoundException.class})
-    public ErrorResponse handleProductNotFoundException(final ProductNotFoundException e) {
-        log.error("Ошибка при попытке обратиться к товару, которого нет в БД!", e);
+    @ExceptionHandler({ProductNotFoundException.class, NoOrderFoundException.class})
+    public ErrorResponse handleProductNotFoundException(final Exception e) {
+        log.error("Ошибка при попытке обратиться к несуществующему ресурсу!", e);
         return new ErrorResponse(e.getMessage());
     }
 
