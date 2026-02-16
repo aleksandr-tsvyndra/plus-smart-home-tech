@@ -20,6 +20,9 @@ public interface OrderApi {
     @GetMapping("/api/v1/order")
     Page<OrderDto> getClientOrders(@RequestParam String username, @PageableDefault Pageable pageable);
 
+    @GetMapping("/api/v1/order/payment")
+    OrderDto getClientOrderByPaymentId(@RequestBody UUID paymentId);
+
     @PutMapping("/api/v1/order")
     OrderDto createNewOrder(@RequestParam String username,
                             @RequestBody @Valid CreateNewOrderRequest newOrderRequest);

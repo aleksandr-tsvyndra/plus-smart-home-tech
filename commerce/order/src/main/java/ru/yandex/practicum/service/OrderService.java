@@ -12,6 +12,8 @@ public interface OrderService {
 
     Page<OrderDto> getClientOrders(String username, Pageable pageable);
 
+    OrderDto getClientOrderByPaymentId(UUID paymentId);
+
     OrderDto createNewOrder(String username, CreateNewOrderRequest newOrderRequest);
 
     OrderDto productReturn(ProductReturnRequest returnRequest);

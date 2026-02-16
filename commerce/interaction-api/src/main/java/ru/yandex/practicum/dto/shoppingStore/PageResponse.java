@@ -1,4 +1,4 @@
-package ru.yandex.practicum.controller;
+package ru.yandex.practicum.dto.shoppingStore;
 
 import lombok.Getter;
 import lombok.ToString;

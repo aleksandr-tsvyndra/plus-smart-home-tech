@@ -41,6 +41,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public OrderDto getClientOrderByPaymentId(UUID paymentId) {
+        Order order = orderRepo.findByPaymentId(paymentId)
+                .orElseThrow(() -> new NoOrderFoundException("Заказ с paymentId=" + paymentId + "не найден!"));
+        return mapper.toDto(order);
+    }
+
+    @Override
     @Transactional
     public OrderDto createNewOrder(String username, CreateNewOrderRequest newOrder) {
         if (username == null || username.isBlank()) {

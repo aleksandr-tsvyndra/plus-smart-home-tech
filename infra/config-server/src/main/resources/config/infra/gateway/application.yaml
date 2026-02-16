@@ -58,5 +58,21 @@ spring:
                   maxBackoff: 5s
                   factor: 2
 
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
+          filters:
+            - PrefixPath=/api/v1
+            - name: Retry
+              args:
+                retries: 3
+                statuses:
+                  - NOT_FOUND
+                backoff:
+                  firstBackoff: 1s
+                  maxBackoff: 5s
+                  factor: 2
+
 server:
   port: 8080

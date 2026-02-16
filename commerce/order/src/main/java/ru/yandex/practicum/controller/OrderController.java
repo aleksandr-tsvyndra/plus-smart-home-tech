@@ -26,6 +26,12 @@ public class OrderController implements OrderApi {
     }
 
     @Override
+    public OrderDto getClientOrderByPaymentId(UUID paymentId) {
+        log.info("Запрос на получение заказа по paymentId={}", paymentId);
+        return orderService.getClientOrderByPaymentId(paymentId);
+    }
+
+    @Override
     public OrderDto createNewOrder(String username, CreateNewOrderRequest newOrderRequest) {
         log.info("Запрос на создание нового заказа в системе");
         return orderService.createNewOrder(username, newOrderRequest);
