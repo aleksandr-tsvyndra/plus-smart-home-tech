@@ -96,7 +96,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDto deliveryFailed(UUID orderId) {
         Order order = findOrderById(orderId);
         order.setState(OrderState.DELIVERY_FAILED);
-        log.info("Значение поля state стало: {}. Сохраняем заказ с ошибкой доставки в БД...", order.getState());
+        log.warn("Значение поля state стало: {}. Сохраняем заказ с ошибкой доставки в БД...", order.getState());
         return mapper.toDto(orderRepo.save(order));
     }
 

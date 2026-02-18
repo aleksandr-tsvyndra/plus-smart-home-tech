@@ -9,6 +9,15 @@ spring:
             - Path=/shopping-cart/**
           filters:
             - PrefixPath=/api/v1
+            - name: Retry
+              args:
+                retries: 3
+                statuses:
+                  - NOT_FOUND
+                backoff:
+                  firstBackoff: 1s
+                  maxBackoff: 5s
+                  factor: 2
 
         - id: shopping_store_service_route
           uri: lb://shopping-store
@@ -62,6 +71,22 @@ spring:
           uri: lb://payment
           predicates:
             - Path=/payment/**
+          filters:
+            - PrefixPath=/api/v1
+            - name: Retry
+              args:
+                retries: 3
+                statuses:
+                  - NOT_FOUND
+                backoff:
+                  firstBackoff: 1s
+                  maxBackoff: 5s
+                  factor: 2
+
+        - id: delivery_service_route
+          uri: lb://delivery
+          predicates:
+            - Path=/delivery/**
           filters:
             - PrefixPath=/api/v1
             - name: Retry

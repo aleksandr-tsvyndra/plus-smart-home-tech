@@ -34,8 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentDto createPayment(OrderDto orderDto) {
-        if (orderDto.getTotalPrice() == null || orderDto.getDeliveryPrice() == null
-                || orderDto.getProductPrice() == null) {
+        if (orderDto.getTotalPrice() == 0 || orderDto.getDeliveryPrice() == 0 || orderDto.getProductPrice() == 0) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для оплаты заказа");
         }
         Payment newPayment = buildNewPayment(orderDto);
@@ -45,7 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Double getTotalCost(OrderDto orderDto) {
-        if (orderDto.getProductPrice() == null || orderDto.getDeliveryPrice() == null) {
+        if (orderDto.getProductPrice() == 0 || orderDto.getDeliveryPrice() == 0) {
             throw new NotEnoughInfoInOrderToCalculateException("Нехватает данных для расчёта полной стоимости заказа");
         }
         Double totalCost = orderDto.getProductPrice() * FEE + orderDto.getDeliveryPrice();
