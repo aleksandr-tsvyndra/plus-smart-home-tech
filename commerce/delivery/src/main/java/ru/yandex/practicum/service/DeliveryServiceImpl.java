@@ -25,6 +25,7 @@ import java.util.UUID;
 public class DeliveryServiceImpl implements DeliveryService {
     private final DeliveryRepository deliveryRepo;
     private final DeliveryMapper mapper;
+
     private final OrderFeignClient orderFeignClient;
     private final WarehouseFeignClient warehouseFeignClient;
 
@@ -93,7 +94,7 @@ public class DeliveryServiceImpl implements DeliveryService {
             total = total * WAREHOUSE_ADDRESS_2_RATIO + BASE_DELIVERY_COST;
             log.info("Доставка содержит ADDRESS_2: умножаем на 2 и складываем с базовой ценой: {}", total);
         }
-        if (dto.isFragile()) {
+        if (dto.getFragile()) {
             total += total * DELIVERY_FRAGILE_RATIO;
             log.info("Цена доставки увеличена из-за признака хрупкости: {}", total);
         }

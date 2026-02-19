@@ -38,7 +38,7 @@ public class OrderDto {
     @PositiveOrZero
     private Double deliveryVolume = 0.0;
 
-    private boolean fragile;
+    private Boolean fragile = false;
 
     @PositiveOrZero
     private Double totalPrice = 0.0;

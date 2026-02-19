@@ -39,6 +39,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final OrderBookingRepository orderBookingRepo;
     private final WarehouseMapper warehouseMapper;
     private final OrderBookingMapper orderBookingMapper;
+
     private final OrderFeignClient orderFeignClient;
 
     private AddressDto warehouseAddress = setAddress();
