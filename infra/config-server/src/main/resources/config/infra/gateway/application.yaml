@@ -9,15 +9,6 @@ spring:
             - Path=/shopping-cart/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                backoff:
-                  firstBackoff: 1s
-                  maxBackoff: 5s
-                  factor: 2
 
         - id: shopping_store_service_route
           uri: lb://shopping-store
@@ -25,15 +16,6 @@ spring:
             - Path=/shopping-store/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                backoff:
-                  firstBackoff: 1s
-                  maxBackoff: 5s
-                  factor: 2
 
         - id: warehouse_service_route
           uri: lb://warehouse
@@ -41,15 +23,6 @@ spring:
             - Path=/warehouse/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                backoff:
-                  firstBackoff: 1s
-                  maxBackoff: 5s
-                  factor: 2
 
         - id: order_service_route
           uri: lb://order
@@ -57,15 +30,6 @@ spring:
             - Path=/order/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                backoff:
-                  firstBackoff: 1s
-                  maxBackoff: 5s
-                  factor: 2
 
         - id: payment_service_route
           uri: lb://payment
@@ -73,15 +37,6 @@ spring:
             - Path=/payment/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                backoff:
-                  firstBackoff: 1s
-                  maxBackoff: 5s
-                  factor: 2
 
         - id: delivery_service_route
           uri: lb://delivery
@@ -89,15 +44,6 @@ spring:
             - Path=/delivery/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                backoff:
-                  firstBackoff: 1s
-                  maxBackoff: 5s
-                  factor: 2
 
 server:
   port: 8080
