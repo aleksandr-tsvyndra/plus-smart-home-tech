@@ -7,11 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.exception.delivery.NoDeliveryFoundException;
+import ru.yandex.practicum.exception.order.NoOrderFoundException;
+import ru.yandex.practicum.exception.payment.NotEnoughInfoInOrderToCalculateException;
+import ru.yandex.practicum.exception.payment.PaymentNotFoundException;
 import ru.yandex.practicum.exception.shoppingCart.DeactivatedShoppingCartException;
 import ru.yandex.practicum.exception.shoppingCart.NoProductsInShoppingCartException;
 import ru.yandex.practicum.exception.shoppingCart.NotAuthorizedUserException;
 import ru.yandex.practicum.exception.shoppingCart.ShoppingCartNotFoundException;
 import ru.yandex.practicum.exception.shoppingStore.ProductNotFoundException;
+import ru.yandex.practicum.exception.warehouse.NoOrderBookingException;
 import ru.yandex.practicum.exception.warehouse.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.warehouse.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.warehouse.SpecifiedProductAlreadyInWarehouseException;
@@ -28,9 +33,15 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler({ProductNotFoundException.class})
-    public ErrorResponse handleProductNotFoundException(final ProductNotFoundException e) {
-        log.error("Ошибка при попытке обратиться к товару, которого нет в БД!", e);
+    @ExceptionHandler({
+            ProductNotFoundException.class,
+            NoOrderFoundException.class,
+            NoDeliveryFoundException.class,
+            PaymentNotFoundException.class,
+            NoOrderBookingException.class
+    })
+    public ErrorResponse handleProductNotFoundException(final Exception e) {
+        log.error("Ошибка при попытке обратиться к несуществующему ресурсу!", e);
         return new ErrorResponse(e.getMessage());
     }
 
@@ -61,6 +72,13 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleProductWarehouseException(final Exception e) {
         log.error("Ошибка, связанная с товаром на складе!", e);
         return new ErrorResponse("Ошибка, связанная с товаром на складе: " + e.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({NotEnoughInfoInOrderToCalculateException.class})
+    public ErrorResponse handleNotEnoughInfoInOrderToCalculateException(final Exception e) {
+        log.error("Недостаточно информации в заказе для расчёта!", e);
+        return new ErrorResponse("Ошибка, связанная с оплатой заказа: " + e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

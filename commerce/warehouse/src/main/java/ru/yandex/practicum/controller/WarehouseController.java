@@ -7,9 +7,14 @@ import ru.yandex.practicum.api.WarehouseApi;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
+import ru.yandex.practicum.dto.warehouse.AssemblyProductsForOrderRequest;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
 import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.ShippedToDeliveryRequest;
 import ru.yandex.practicum.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -39,5 +44,23 @@ public class WarehouseController implements WarehouseApi {
     public AddressDto getWarehouseAddress() {
         log.info("Запрос на предоставление адреса склада для расчёта доставки");
         return warehouseService.getWarehouseAddress();
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest productsForOrder) {
+        log.info("Запрос на сборку товаров к заказу для подготовки к отправке: {}", productsForOrder);
+        return warehouseService.assemblyProductsForOrder(productsForOrder);
+    }
+
+    @Override
+    public void shippedToDelivery(ShippedToDeliveryRequest shippedToDelivery) {
+        log.info("Запрос на передачу товаров в доставку: {}", shippedToDelivery);
+        warehouseService.shippedToDelivery(shippedToDelivery);
+    }
+
+    @Override
+    public void acceptReturn(Map<UUID, Integer> returnProducts) {
+        log.info("Запрос на приём возврата товаров на склад: {}", returnProducts);
+        warehouseService.acceptReturn(returnProducts);
     }
 }
