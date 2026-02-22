@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,11 +42,11 @@ public class OrderDto {
     private Boolean fragile = false;
 
     @PositiveOrZero
-    private Double totalPrice = 0.0;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @PositiveOrZero
-    private Double deliveryPrice = 0.0;
+    private BigDecimal deliveryPrice = BigDecimal.ZERO;
 
     @PositiveOrZero
-    private Double productPrice = 0.0;
+    private BigDecimal productPrice = BigDecimal.ZERO;
 }

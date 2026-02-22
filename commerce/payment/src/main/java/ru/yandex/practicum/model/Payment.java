@@ -13,6 +13,7 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.yandex.practicum.dto.payment.PaymentState;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -26,13 +27,13 @@ public class Payment {
     private UUID paymentId;
 
     @Column(name = "total_payment", nullable = false)
-    private Double totalPayment;
+    private BigDecimal totalPayment;
 
     @Column(name = "total_product", nullable = false)
-    private Double totalProduct;
+    private BigDecimal totalProduct;
 
     @Column(name = "delivery_total", nullable = false)
-    private Double deliveryTotal;
+    private BigDecimal deliveryTotal;
 
     @Enumerated(EnumType.STRING)
     private PaymentState state = PaymentState.PENDING;

@@ -17,6 +17,7 @@ import ru.yandex.practicum.mapper.PaymentMapper;
 import ru.yandex.practicum.model.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -30,12 +31,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final ShoppingStoreFeignClient shoppingStore;
     private final OrderFeignClient order;
 
-    private static final Double FEE = 1.1;
+    private static final BigDecimal FEE = BigDecimal.valueOf(1.1);
 
     @Override
     @Transactional
     public PaymentDto createPayment(OrderDto orderDto) {
-        if (orderDto.getTotalPrice() == 0 || orderDto.getDeliveryPrice() == 0 || orderDto.getProductPrice() == 0) {
+        if (orderDto.getTotalPrice().equals(BigDecimal.ZERO) || orderDto.getDeliveryPrice().equals(BigDecimal.ZERO)
+                || orderDto.getProductPrice().equals(BigDecimal.ZERO)) {
             throw new NotEnoughInfoInOrderToCalculateException("Недостаточно данных для оплаты заказа");
         }
         Payment newPayment = buildNewPayment(orderDto);
@@ -44,26 +46,28 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Double getTotalCost(OrderDto orderDto) {
-        if (orderDto.getProductPrice() == 0 || orderDto.getDeliveryPrice() == 0) {
+    public BigDecimal getTotalCost(OrderDto orderDto) {
+        if (orderDto.getProductPrice().equals(BigDecimal.ZERO)
+                || orderDto.getDeliveryPrice().equals(BigDecimal.ZERO)) {
             throw new NotEnoughInfoInOrderToCalculateException("Нехватает данных для расчёта полной стоимости заказа");
         }
-        Double totalCost = orderDto.getProductPrice() * FEE + orderDto.getDeliveryPrice();
+        BigDecimal totalCost = orderDto.getProductPrice().multiply(FEE).add(orderDto.getDeliveryPrice());
         log.info("Полная стоимость заказа: {}", totalCost);
         return totalCost;
     }
 
     @Override
-    public Double getProductCost(OrderDto orderDto) {
+    public BigDecimal getProductCost(OrderDto orderDto) {
         Map<UUID,Integer> products = orderDto.getProducts();
         if (products == null || products.isEmpty()) {
             throw new IllegalArgumentException("Список товаров не может быть null или пустым");
         }
-        double productsCost = 0.0;
+        BigDecimal productsCost = BigDecimal.ZERO;
         for (var productId : products.keySet()) {
             try {
                 ProductDto product = shoppingStore.findProductById(productId.toString());
-                productsCost += products.get(productId) * product.getPrice();
+                BigDecimal productPrice = BigDecimal.valueOf(product.getPrice());
+                productsCost = productsCost.add(productPrice.multiply(BigDecimal.valueOf(products.get(productId))));
             } catch (ProductNotFoundException e) {
                 log.warn("Товар с id={} не найден. Никак не реагируем.", productId);
             }

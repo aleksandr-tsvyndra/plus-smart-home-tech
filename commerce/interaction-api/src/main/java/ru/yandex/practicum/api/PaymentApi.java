@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public interface PaymentApi {
@@ -14,10 +15,10 @@ public interface PaymentApi {
     PaymentDto createPayment(@RequestBody @Valid OrderDto orderDto);
 
     @PostMapping("/api/v1/payment/totalCost")
-    Double getTotalCost(@RequestBody @Valid OrderDto orderDto);
+    BigDecimal getTotalCost(@RequestBody @Valid OrderDto orderDto);
 
     @PostMapping("/api/v1/payment/productCost")
-    Double getProductCost(@RequestBody @Valid OrderDto orderDto);
+    BigDecimal getProductCost(@RequestBody @Valid OrderDto orderDto);
 
     @PostMapping("/api/v1/payment/refund")
     void paymentSuccess(@RequestBody UUID paymentId);

@@ -20,6 +20,7 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.yandex.practicum.dto.order.OrderState;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.UUID;
 
@@ -63,13 +64,13 @@ public class Order {
     private Boolean fragile;
 
     @Column(name = "total_price")
-    private Double totalPrice;
+    private BigDecimal totalPrice;
 
     @Column(name = "product_price")
-    private Double productPrice;
+    private BigDecimal productPrice;
 
     @Column(name = "delivery_price")
-    private Double deliveryPrice;
+    private BigDecimal deliveryPrice;
 
     @Column(nullable = false)
     private String username;

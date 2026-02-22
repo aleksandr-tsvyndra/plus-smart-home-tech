@@ -16,6 +16,7 @@ import ru.yandex.practicum.model.Address;
 import ru.yandex.practicum.model.Delivery;
 import ru.yandex.practicum.repository.DeliveryRepository;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -29,12 +30,12 @@ public class DeliveryServiceImpl implements DeliveryService {
     private final OrderFeignClient orderFeignClient;
     private final WarehouseFeignClient warehouseFeignClient;
 
-    private static final Double BASE_DELIVERY_COST = 5.0;
-    private static final Double DELIVERY_VOLUME_RATIO = 0.2;
-    private static final Double DELIVERY_WEIGHT_RATIO = 0.3;
-    private static final Double DELIVERY_FRAGILE_RATIO = 0.2;
-    private static final Double WAREHOUSE_ADDRESS_2_RATIO = 2.0;
-    private static final Double ADDRESS_RATIO = 0.2;
+    private static final BigDecimal BASE_DELIVERY_COST = BigDecimal.valueOf(5.0);
+    private static final BigDecimal DELIVERY_VOLUME_RATIO = BigDecimal.valueOf(0.2);
+    private static final BigDecimal DELIVERY_WEIGHT_RATIO = BigDecimal.valueOf(0.3);
+    private static final BigDecimal DELIVERY_FRAGILE_RATIO = BigDecimal.valueOf(0.2);
+    private static final BigDecimal WAREHOUSE_ADDRESS_2_RATIO = BigDecimal.valueOf(2.0);
+    private static final BigDecimal ADDRESS_RATIO = BigDecimal.valueOf(0.2);
 
     @Override
     @Transactional
@@ -83,26 +84,26 @@ public class DeliveryServiceImpl implements DeliveryService {
     }
 
     @Override
-    public Double deliveryCost(OrderDto dto) {
+    public BigDecimal deliveryCost(OrderDto dto) {
         Delivery delivery = findDeliveryById(dto.getDeliveryId());
-        double total = BASE_DELIVERY_COST;
+        BigDecimal total = BASE_DELIVERY_COST;
         log.info("Базовая цена доставки: {}", total);
         if (isSameAddress(delivery.getFromAddress(), "ADDRESS_1")) {
-            total += BASE_DELIVERY_COST;
+            total = total.add(BASE_DELIVERY_COST);
             log.info("Доставка содержит ADDRESS_1: складываем с базовой ценой: {}", total);
         } else if (isSameAddress(delivery.getFromAddress(), "ADDRESS_2")) {
-            total = total * WAREHOUSE_ADDRESS_2_RATIO + BASE_DELIVERY_COST;
+            total = total.multiply(WAREHOUSE_ADDRESS_2_RATIO).add(BASE_DELIVERY_COST);
             log.info("Доставка содержит ADDRESS_2: умножаем на 2 и складываем с базовой ценой: {}", total);
         }
         if (dto.getFragile()) {
-            total += total * DELIVERY_FRAGILE_RATIO;
+            total = total.multiply(DELIVERY_FRAGILE_RATIO).add(total);
             log.info("Цена доставки увеличена из-за признака хрупкости: {}", total);
         }
-        total += dto.getDeliveryWeight() * DELIVERY_WEIGHT_RATIO;
-        total += dto.getDeliveryVolume() * DELIVERY_VOLUME_RATIO;
+        total = BigDecimal.valueOf(dto.getDeliveryWeight()).multiply(DELIVERY_WEIGHT_RATIO).add(total);
+        total = BigDecimal.valueOf(dto.getDeliveryVolume()).multiply(DELIVERY_VOLUME_RATIO).add(total);
         log.info("Добавили к цене доставки вес заказа и его объём: {}", total);
         if (!delivery.getFromAddress().getStreet().equals(delivery.getToAddress().getStreet())) {
-            total += total * ADDRESS_RATIO;
+            total = total.multiply(ADDRESS_RATIO).add(total);
             log.info("Цена доставки увеличена — адрес доставки не совпадает с адресом склада: {}", total);
         }
         log.info("Итоговая цена доставки для заказа с id={} составляет: {}", dto.getOrderId(), total);

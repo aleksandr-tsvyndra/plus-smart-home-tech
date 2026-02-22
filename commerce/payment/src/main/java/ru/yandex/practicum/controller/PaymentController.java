@@ -8,6 +8,7 @@ import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
 import ru.yandex.practicum.service.PaymentService;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Slf4j
@@ -23,13 +24,13 @@ public class PaymentController implements PaymentApi {
     }
 
     @Override
-    public Double getTotalCost(OrderDto orderDto) {
+    public BigDecimal getTotalCost(OrderDto orderDto) {
         log.info("Запрос на расчёт полной стоимости заказа с id={}", orderDto.getOrderId());
         return paymentService.getTotalCost(orderDto);
     }
 
     @Override
-    public Double getProductCost(OrderDto orderDto) {
+    public BigDecimal getProductCost(OrderDto orderDto) {
         log.info("Запрос на расчёт стоимости товаров в заказе с id={}", orderDto.getOrderId());
         return paymentService.getProductCost(orderDto);
     }
