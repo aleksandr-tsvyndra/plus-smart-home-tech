@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter @Setter @ToString
@@ -13,12 +14,12 @@ public class PaymentDto {
     private UUID paymentId;
 
     @PositiveOrZero
-    private Double totalPayment;
+    private BigDecimal totalPayment;
 
     @PositiveOrZero
-    private Double deliveryTotal;
+    private BigDecimal deliveryTotal;
 
     @PositiveOrZero
-    private Double feeTotal;
+    private BigDecimal feeTotal;
 
 }

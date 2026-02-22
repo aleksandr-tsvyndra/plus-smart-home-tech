@@ -88,21 +88,26 @@ public class WarehouseServiceImpl implements WarehouseService {
         double deliveryVolume = 0.0;
         boolean fragile = false;
 
-        for (var product : productsForOrder.getProducts().entrySet()) {
-            WarehouseProduct warehouseProduct = findWarehouseProductById(product.getKey());
-            if (warehouseProduct.getQuantity() < product.getValue()) {
-                String message = "На складе нет нужного количества товара с id=" + product.getKey();
-                throw new ProductInShoppingCartLowQuantityInWarehouse(message);
+        List<WarehouseProduct> warehouseProducts = warehouseRepo.findAllById(productsForOrder.getProducts().keySet());
+
+        for (var warehouseProduct : warehouseProducts) {
+            if (productsForOrder.getProducts().containsKey(warehouseProduct.getProductId())) {
+                int productForOrderQuantity = productsForOrder.getProducts().get(warehouseProduct.getProductId());
+                if (warehouseProduct.getQuantity() < productForOrderQuantity) {
+                    String message = "На складе нет нужного количества товара с id=" + warehouseProduct.getProductId();
+                    throw new ProductInShoppingCartLowQuantityInWarehouse(message);
+                }
+                warehouseProduct.setQuantity(warehouseProduct.getQuantity() - productForOrderQuantity);
             }
-            warehouseProduct.setQuantity(warehouseProduct.getQuantity() - product.getValue());
-            warehouseRepo.save(warehouseProduct);
-            log.info("Остаток товара с id={} на складе: {}", product.getKey(), warehouseProduct.getQuantity());
+            log.info("Остаток товара с id={} на складе: {}", warehouseProduct.getProductId(), warehouseProduct.getQuantity());
             deliveryWeight += warehouseProduct.getWeight();
             deliveryVolume += getWarehouseProductVolume(warehouseProduct);
             if (warehouseProduct.isFragile()) {
                 fragile = true;
             }
         }
+
+        warehouseRepo.saveAll(warehouseProducts);
 
         var orderBooking = OrderBooking.builder()
                 .orderId(productsForOrder.getOrderId())

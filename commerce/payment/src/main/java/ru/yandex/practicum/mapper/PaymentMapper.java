@@ -11,7 +11,7 @@ public interface PaymentMapper {
 
     @Mapping(
             target = "feeTotal",
-            expression = "java(payment.getTotalPayment() - payment.getTotalProduct() - payment.getDeliveryTotal())"
+            expression = "java(payment.getTotalPayment().subtract(payment.getTotalProduct()).subtract(payment.getDeliveryTotal()))"
     )
     PaymentDto toDto(Payment payment);
 
